@@ -48,19 +48,24 @@ $CC $CFLAGS -o 1_5_barrier_implementations/barrier_sense \
 
 echo "Compilation finished. Running experiments..."
 
+# Create logs dir and timestamped filenames so each run is preserved
+LOG_DIR="logs"
+mkdir -p "$LOG_DIR"
+TS=$(date +%Y%m%d-%H%M%S)
+
 echo "Running Exercise 1.1 - Polynomial Multiplication Experiments..."
-(cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) > results_1.1.txt
+(cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) > "$LOG_DIR/results_1.1_${TS}.txt" 2>&1
 
 echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
-(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > results_1.2.txt
+(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
 
 echo "Running Exercise 1.3 - Array Analysis Experiments..."
-(cd 1_3_array_analysis && ./run_arr_analysis.sh) > results_1.3.txt
+(cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
 
 echo "Running Exercise 1.4 - Bank Simulation Experiments..."
-(cd 1_4_bank_simulation && ./run_bank_sim.sh) > results_1.4.txt
+(cd 1_4_bank_simulation && ./run_bank_sim.sh) > "$LOG_DIR/results_1.4_${TS}.txt" 2>&1
 
 echo "Running Exercise 1.5 - Different Barrier Implementations Experiments..."
-(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > results_1.5.txt
+(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > "$LOG_DIR/results_1.5_${TS}.txt" 2>&1
 
-echo "All experiments completed. Results saved to results_*.txt files"
+echo "All experiments completed. Logs saved to $LOG_DIR/ (timestamp: $TS)"
