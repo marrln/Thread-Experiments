@@ -53,6 +53,43 @@ LOG_DIR="logs"
 mkdir -p "$LOG_DIR"
 TS=$(date +%Y%m%d-%H%M%S)
 
+# Determine RUN_USER and write per-user metadata JSON
+if [ -z "$RUN_USER" ]; then
+		RUN_USER=$(whoami 2>/dev/null || echo "${USER:-unknown}")
+fi
+export RUN_USER
+
+METADATA_DIR="metadata"
+mkdir -p "$METADATA_DIR"
+METADATA_FILE="$METADATA_DIR/${RUN_USER}.json"
+
+# Collect hardware/build info (best-effort, Linux-friendly)
+HOST=$(hostname 2>/dev/null || echo unknown)
+RUN_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+CPU_MODEL=$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | sed -E 's/.*: //' || echo unknown)
+CPU_MODEL=${CPU_MODEL//,/; }
+NCPUS=$(nproc 2>/dev/null || echo 1)
+MEM_KB=$(awk '/MemTotal/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)
+OS_INFO=$(lsb_release -ds 2>/dev/null || uname -srv)
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
+
+cat > "$METADATA_FILE" <<EOF
+{
+	"user": "${RUN_USER}",
+	"collected_at": "${RUN_TS}",
+	"host": "${HOST}",
+	"os": "${OS_INFO}",
+	"cpu_model": "${CPU_MODEL}",
+	"n_logical_cpus": ${NCPUS},
+	"mem_kb": ${MEM_KB},
+	"compiler": "${CC}",
+	"compiler_flags": "${CFLAGS}",
+	"git_commit": "${GIT_COMMIT}"
+}
+EOF
+
+echo "Wrote metadata to $METADATA_FILE"
+
 echo "Running Exercise 1.1 - Polynomial Multiplication Experiments..."
 (cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) > "$LOG_DIR/results_1.1_${TS}.txt" 2>&1
 
