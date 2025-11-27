@@ -3,9 +3,11 @@
 echo "Exercise 1.3 - Array Analysis"
 echo "============================="
 
-# Create CSV file with header
+# Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_1.3.csv"
-echo "version,size,arr0,arr1,arr2,arr3,time_alloc,time_init,time_seq_baseline,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > $CSV_FILE
+if [ ! -f "$CSV_FILE" ]; then
+    echo "version,size,arr0,arr1,arr2,arr3,time_alloc,time_init,time_seq_baseline,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > "$CSV_FILE"
+fi
 
 for size in 100000 1000000 5000000; do
     echo "Array size: $size"

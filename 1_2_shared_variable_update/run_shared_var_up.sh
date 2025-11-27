@@ -3,9 +3,11 @@
 echo "Exercise 1.2 - Shared Variable Update"
 echo "====================================="
 
-# Create CSV file with header
+# Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_1.2.csv"
-echo "method,iterations,threads,final_value,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > $CSV_FILE
+if [ ! -f "$CSV_FILE" ]; then
+    echo "method,iterations,threads,final_value,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > "$CSV_FILE"
+fi
 
 for iterations in 100000 1000000; do
     for threads in 1 2 4 8; do

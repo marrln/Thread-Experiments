@@ -3,9 +3,11 @@
 echo "Exercise 1.5 - Barrier Implementations"
 echo "======================================"
 
-# Create CSV file with header
+# Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_1.5.csv"
-echo "barrier_type,iterations,threads,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total" > $CSV_FILE
+if [ ! -f "$CSV_FILE" ]; then
+    echo "barrier_type,iterations,threads,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total" > "$CSV_FILE"
+fi
 
 for iterations in 10000 50000 100000; do
     for threads in 2 4 8 16; do

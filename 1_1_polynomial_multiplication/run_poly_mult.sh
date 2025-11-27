@@ -3,9 +3,11 @@
 echo "Exercise 1.1 - Polynomial Multiplication"
 echo "========================================"
 
-# Create CSV file with header
+# Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_1.1.csv"
-echo "degree,threads,time_alloc,time_init,time_seq_baseline,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > $CSV_FILE
+if [ ! -f "$CSV_FILE" ]; then
+    echo "degree,threads,time_alloc,time_init,time_seq_baseline,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification" > "$CSV_FILE"
+fi
 
 for degree in 1000 5000 10000; do
     echo "Degree: $degree"

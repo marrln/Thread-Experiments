@@ -6,9 +6,11 @@ echo "=============================="
 transactions_per_thread=10000
 num_threads=4
 
-# Create CSV file with header
+# Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_1.4.csv"
-echo "locking_scheme,accounts,query_pct,time_alloc,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total" > $CSV_FILE
+if [ ! -f "$CSV_FILE" ]; then
+    echo "locking_scheme,accounts,query_pct,time_alloc,time_init,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total" > "$CSV_FILE"
+fi
 
 echo "Sequential Baseline"
 echo "-------------------"
