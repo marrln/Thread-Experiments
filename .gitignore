@@ -1,4 +1,7 @@
+# Ignore build artifacts and temporary files
 /.vscode
+/.github
+logs/*
 
 # Compiled Object files and Executables
 git
