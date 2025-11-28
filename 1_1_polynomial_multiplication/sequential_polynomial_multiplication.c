@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     double time_cleanup = (t_end.tv_sec - t_compute.tv_sec) + (t_end.tv_usec - t_compute.tv_usec) / 1000000.0;
     double time_total = (t_end.tv_sec - t_start.tv_sec) + (t_end.tv_usec - t_start.tv_usec) / 1000000.0;
     
-    printf("%f,%f,%f,0.0,0.0,0.0,%f,%f,PASS\n",
-           time_alloc, time_init, time_seq, time_cleanup, time_total);
+        printf("%f,%f,%f,0.0,0.0,0.0,%f,%f\n",
+            time_alloc, time_init, time_seq, time_cleanup, time_total);
     
     return 0;
 }
