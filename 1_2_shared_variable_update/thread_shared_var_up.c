@@ -50,7 +50,7 @@ void *increment_atomic(void *arg) {
     for (long long i = 0; i < data->iterations; i++) {
         local_sum++;
     }
-    __sync_fetch_and_add(data->shared_var, local_sum);
+    __atomic_fetch_add(data->shared_var, local_sum, __ATOMIC_SEQ_CST);
     return NULL;
 }
 
