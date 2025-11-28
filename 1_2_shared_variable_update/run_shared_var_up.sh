@@ -14,7 +14,7 @@ if [ ! -f "$CSV_FILE" ]; then
 fi
 
 for iterations in 100000 1000000; do
-    for threads in 1 2 4 8; do
+    for threads in 1 2 4 8 16; do
         echo "Iterations: $iterations, Threads: $threads"
         
         # Sequential baseline
