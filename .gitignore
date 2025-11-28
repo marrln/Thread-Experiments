@@ -1,7 +1,15 @@
+# Ignore binary directories
+1_1_polynomial_multiplication/bin/*
+1_2_shared_variable_update/bin/*
+1_3_array_analysis/bin/*
+1_4_bank_simulation/bin/*
+1_5_barrier_implementations/bin/*
+
 # Ignore build artifacts and temporary files
 /.vscode
 /.github
 logs/*
+metadata/*
 
 # Compiled Object files and Executables
 git
