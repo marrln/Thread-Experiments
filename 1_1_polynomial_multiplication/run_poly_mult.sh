@@ -13,7 +13,7 @@ if [ ! -f "$CSV_FILE" ]; then
     echo "degree,threads,time_alloc,time_init,time_seq_baseline,time_thread_create,time_compute,time_thread_join,time_cleanup,time_total,verification,user" > "$CSV_FILE"
 fi
 
-for degree in 1000 5000 10000; do
+for degree in 5000 20000 80000 100000; do
     echo "Degree: $degree"
     
     # Sequential baseline
@@ -23,7 +23,7 @@ for degree in 1000 5000 10000; do
     echo "$degree,sequential,$output,$RUN_USER" >> $CSV_FILE
     
     # Parallel versions
-    for threads in 1 2 4 8; do
+    for threads in 1 2 4 8 16; do
         echo -n "Threads: $threads - "
         output=$(./bin/poly_mult $degree $threads)
         echo "$output"
