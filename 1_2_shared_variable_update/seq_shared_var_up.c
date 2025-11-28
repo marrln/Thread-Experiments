@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
     long long iterations = atoll(argv[2]);
     int num_threads = atoi(argv[3]);
     long long total_iterations = iterations * num_threads;
+    long long expected = total_iterations;
     
     struct timeval t_start, t_init, t_compute, t_end;
     
@@ -32,8 +33,9 @@ int main(int argc, char *argv[]) {
     double time_compute = (t_compute.tv_sec - t_init.tv_sec) + (t_compute.tv_usec - t_init.tv_usec) / 1000000.0;
     double time_total = (t_end.tv_sec - t_start.tv_sec) + (t_end.tv_usec - t_start.tv_usec) / 1000000.0;
     
-    printf("%lld,%f,0.0,%f,0.0,0.0,%f,PASS\n",
-           shared_var, time_init, time_compute, time_total);
+    printf("%lld,%f,0.0,%f,0.0,0.0,%f,%s\n",
+           shared_var, time_init, time_compute, time_total,
+           (shared_var == expected) ? "PASS" : "FAIL");
     
     return 0;
 }
