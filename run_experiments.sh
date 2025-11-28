@@ -97,24 +97,24 @@ EOF
 
 echo "Wrote metadata to $METADATA_FILE"
 
-echo "Running Exercise 1.1 - Polynomial Multiplication Experiments..."
-# Run exercise 1.1 ten times, saving per-run and aggregate logs
-for i in $(seq 1 5); do
-	RUN_LOG="$LOG_DIR/results_1.1_${TS}_run${i}.txt"
-	echo "Run $i/10 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
-	if (cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
-	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
-	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
-	# append this run to aggregate file
-	cat "$RUN_LOG" >> "$LOG_DIR/results_1.1_${TS}.txt"
-	echo >> "$LOG_DIR/results_1.1_${TS}.txt"
-done
+# echo "Running Exercise 1.1 - Polynomial Multiplication Experiments..."
+# # Run exercise 1.1 ten times, saving per-run and aggregate logs
+# for i in $(seq 1 5); do
+# 	RUN_LOG="$LOG_DIR/results_1.1_${TS}_run${i}.txt"
+# 	echo "Run $i/10 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
+# 	if (cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) >> "$RUN_LOG" 2>&1; then
+# 		echo "Run $i completed successfully" >> "$RUN_LOG"
+# 	else
+# 		echo "Run $i FAILED" >> "$RUN_LOG"
+# 	fi
+# 	echo "===== End Run $i =====" >> "$RUN_LOG"
+# 	# append this run to aggregate file
+# 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.1_${TS}.txt"
+# 	echo >> "$LOG_DIR/results_1.1_${TS}.txt"
+# done
 
-#echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
-#(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
+echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
+(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
 
 #echo "Running Exercise 1.3 - Array Analysis Experiments..."
 #(cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
