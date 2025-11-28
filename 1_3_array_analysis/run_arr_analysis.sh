@@ -17,12 +17,12 @@ for size in 100000 1000000 5000000; do
     echo "Array size: $size"
     
     echo -n "Sequential baseline - "
-    output=$(./seq_arr_analysis $size)
+    output=$(./bin/seq_arr_analysis $size)
     echo "$output"
     echo "sequential,$size,$output,$RUN_USER" >> $CSV_FILE
     
     echo -n "Parallel (4 threads) - "
-    output=$(./array_analysis $size)
+    output=$(./bin/array_analysis $size)
     echo "$output"
     echo "parallel,$size,$output,$RUN_USER" >> $CSV_FILE
     echo

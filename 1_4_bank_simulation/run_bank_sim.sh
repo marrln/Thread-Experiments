@@ -21,7 +21,7 @@ echo "-------------------"
 for accounts in 100 1000 10000; do
     for query_pct in 0.1 0.5 0.9; do
         echo -n "Accounts: $accounts, Query%: $query_pct - "
-        output=$(./seq_bank_sim $accounts $transactions_per_thread $query_pct $num_threads)
+        output=$(./bin/seq_bank_sim $accounts $transactions_per_thread $query_pct $num_threads)
         echo "$output"
         echo "sequential,$accounts,$query_pct,$output,$RUN_USER" >> $CSV_FILE
     done
@@ -38,7 +38,7 @@ for scheme in 1 2 3; do
     for accounts in 100 1000 10000; do
         for query_pct in 0.1 0.5 0.9; do
             echo -n "Accounts: $accounts, Query%: $query_pct - "
-            output=$(./bank_sim $accounts $transactions_per_thread $query_pct $scheme $num_threads)
+            output=$(./bin/bank_sim $accounts $transactions_per_thread $query_pct $scheme $num_threads)
             echo "$output"
             echo "$scheme_name,$accounts,$query_pct,$output,$RUN_USER" >> $CSV_FILE
         done

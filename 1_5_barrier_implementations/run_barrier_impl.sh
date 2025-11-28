@@ -18,17 +18,17 @@ for iterations in 10000 50000 100000; do
         echo "Iterations: $iterations, Threads: $threads"
         
         echo -n "Pthread Barrier: "
-        output=$(./barrier_pthread $iterations $threads)
+        output=$(./bin/barrier_pthread $iterations $threads)
         echo "$output"
         echo "pthread,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
         
         echo -n "Condition Barrier: "
-        output=$(./barrier_cond $iterations $threads)
+        output=$(./bin/barrier_cond $iterations $threads)
         echo "$output"
         echo "cond_var,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
         
         echo -n "Sense-Reversal Barrier: "
-        output=$(./barrier_sense $iterations $threads)
+        output=$(./bin/barrier_sense $iterations $threads)
         echo "$output"
         echo "sense_reversal,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
         
