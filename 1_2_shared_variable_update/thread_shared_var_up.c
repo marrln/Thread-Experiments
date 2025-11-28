@@ -13,11 +13,13 @@ typedef struct {
 
 void *increment_mutex(void *arg) {
     mutex_data_t *data = (mutex_data_t *)arg;
+    long long local_sum = 0;
     for (long long i = 0; i < data->iterations; i++) {
-        pthread_mutex_lock(data->mutex);
-        (*data->shared_var)++;
-        pthread_mutex_unlock(data->mutex);
+        local_sum++;
     }
+    pthread_mutex_lock(data->mutex);
+    (*data->shared_var) += local_sum;
+    pthread_mutex_unlock(data->mutex);
     return NULL;
 }
 
@@ -30,11 +32,13 @@ typedef struct {
 
 void *increment_rwlock(void *arg) {
     rwlock_data_t *data = (rwlock_data_t *)arg;
+    long long local_sum = 0;
     for (long long i = 0; i < data->iterations; i++) {
-        pthread_rwlock_wrlock(data->rwlock);
-        (*data->shared_var)++;
-        pthread_rwlock_unlock(data->rwlock);
+        local_sum++;
     }
+    pthread_rwlock_wrlock(data->rwlock);
+    (*data->shared_var) += local_sum;
+    pthread_rwlock_unlock(data->rwlock);
     return NULL;
 }
 

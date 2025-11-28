@@ -19,9 +19,15 @@ for iterations in 100000 1000000; do
         
         # Sequential baseline
         echo -n "Sequential baseline - "
-        output=$(./bin/seq_shared_var 1 $iterations $threads)
-        echo "$output"
-        echo "sequential,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
+        timeout 60 ./bin/seq_shared_var 1 $iterations $threads > /tmp/seq_output.txt 2>&1
+        if [ $? -eq 124 ]; then
+            echo "TIMEOUT (exceeded 60s)"
+            echo "sequential,$iterations,$threads,TIMEOUT,0,0,0,0,0,0,TIMEOUT,$RUN_USER" >> $CSV_FILE
+        else
+            output=$(cat /tmp/seq_output.txt)
+            echo "$output"
+            echo "sequential,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
+        fi
         
         # Parallel methods
         for method in 1 2 3; do
@@ -30,9 +36,15 @@ for iterations in 100000 1000000; do
             if [ $method -eq 3 ]; then method_name="atomic"; fi
             
             echo -n "Method $method ($method_name) - "
-            output=$(./bin/shared_var $method $iterations $threads)
-            echo "$output"
-            echo "$method_name,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
+            timeout 60 ./bin/shared_var $method $iterations $threads > /tmp/method_output.txt 2>&1
+            if [ $? -eq 124 ]; then
+                echo "TIMEOUT (exceeded 60s)"
+                echo "$method_name,$iterations,$threads,TIMEOUT,0,0,0,0,0,0,TIMEOUT,$RUN_USER" >> $CSV_FILE
+            else
+                output=$(cat /tmp/method_output.txt)
+                echo "$output"
+                echo "$method_name,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
+            fi
         done
         echo
     done
