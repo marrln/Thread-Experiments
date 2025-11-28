@@ -18,32 +18,39 @@ CC=gcc
 CFLAGS="-Wall -O2 -pthread"
 LDFLAGS="-pthread -lm"
 
-# Compile each C source into an executable placed next to the source
-$CC $CFLAGS -o 1_1_polynomial_multiplication/seq_poly_mult \
+# Ensure each experiment has a `bin/` directory to hold compiled executables
+mkdir -p 1_1_polynomial_multiplication/bin
+mkdir -p 1_2_shared_variable_update/bin
+mkdir -p 1_3_array_analysis/bin
+mkdir -p 1_4_bank_simulation/bin
+mkdir -p 1_5_barrier_implementations/bin
+
+# Compile each C source into an executable placed in the experiment's `bin/` folder
+$CC $CFLAGS -o 1_1_polynomial_multiplication/bin/seq_poly_mult \
 	1_1_polynomial_multiplication/sequential_polynomial_multiplication.c $LDFLAGS
-$CC $CFLAGS -o 1_1_polynomial_multiplication/poly_mult \
+$CC $CFLAGS -o 1_1_polynomial_multiplication/bin/poly_mult \
 	1_1_polynomial_multiplication/thread_polynomial_multiplication.c $LDFLAGS
 
-$CC $CFLAGS -o 1_2_shared_variable_update/seq_shared_var \
+$CC $CFLAGS -o 1_2_shared_variable_update/bin/seq_shared_var \
 	1_2_shared_variable_update/seq_shared_var_up.c $LDFLAGS
-$CC $CFLAGS -o 1_2_shared_variable_update/shared_var \
+$CC $CFLAGS -o 1_2_shared_variable_update/bin/shared_var \
 	1_2_shared_variable_update/thread_shared_var_up.c $LDFLAGS
 
-$CC $CFLAGS -o 1_3_array_analysis/seq_arr_analysis \
+$CC $CFLAGS -o 1_3_array_analysis/bin/seq_arr_analysis \
 	1_3_array_analysis/seq_arr_analysis.c $LDFLAGS
-$CC $CFLAGS -o 1_3_array_analysis/array_analysis \
+$CC $CFLAGS -o 1_3_array_analysis/bin/array_analysis \
 	1_3_array_analysis/thread_arr_analysis.c $LDFLAGS
 
-$CC $CFLAGS -o 1_4_bank_simulation/seq_bank_sim \
+$CC $CFLAGS -o 1_4_bank_simulation/bin/seq_bank_sim \
 	1_4_bank_simulation/seq_bank_sim.c $LDFLAGS
-$CC $CFLAGS -o 1_4_bank_simulation/bank_sim \
+$CC $CFLAGS -o 1_4_bank_simulation/bin/bank_sim \
 	1_4_bank_simulation/thread_bank_sim.c $LDFLAGS
 
-$CC $CFLAGS -o 1_5_barrier_implementations/barrier_cond \
+$CC $CFLAGS -o 1_5_barrier_implementations/bin/barrier_cond \
 	1_5_barrier_implementations/cond_barrier_impl.c $LDFLAGS
-$CC $CFLAGS -o 1_5_barrier_implementations/barrier_pthread \
+$CC $CFLAGS -o 1_5_barrier_implementations/bin/barrier_pthread \
 	1_5_barrier_implementations/pthread_barrier_impl.c $LDFLAGS
-$CC $CFLAGS -o 1_5_barrier_implementations/barrier_sense \
+$CC $CFLAGS -o 1_5_barrier_implementations/bin/barrier_sense \
 	1_5_barrier_implementations/sense_reversal_barrier_impl.c $LDFLAGS
 
 echo "Compilation finished. Running experiments..."
@@ -93,8 +100,8 @@ echo "Wrote metadata to $METADATA_FILE"
 echo "Running Exercise 1.1 - Polynomial Multiplication Experiments..."
 (cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) > "$LOG_DIR/results_1.1_${TS}.txt" 2>&1
 
-echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
-(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
+#echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
+#(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
 
 echo "Running Exercise 1.3 - Array Analysis Experiments..."
 (cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
@@ -102,7 +109,7 @@ echo "Running Exercise 1.3 - Array Analysis Experiments..."
 echo "Running Exercise 1.4 - Bank Simulation Experiments..."
 (cd 1_4_bank_simulation && ./run_bank_sim.sh) > "$LOG_DIR/results_1.4_${TS}.txt" 2>&1
 
-echo "Running Exercise 1.5 - Different Barrier Implementations Experiments..."
-(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > "$LOG_DIR/results_1.5_${TS}.txt" 2>&1
+#echo "Running Exercise 1.5 - Different Barrier Implementations Experiments..."
+#(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > "$LOG_DIR/results_1.5_${TS}.txt" 2>&1
 
 echo "All experiments completed. Logs saved to $LOG_DIR/ (timestamp: $TS)"
