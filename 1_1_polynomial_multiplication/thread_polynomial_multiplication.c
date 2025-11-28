@@ -5,25 +5,32 @@
 #include <sys/time.h>
 
 typedef struct {
-    int *A, *B, *C;
-    int n, start, end;
+    int *A, *B;
+    int *C;        // PRIVATE buffer for each thread
+    int n;
     int thread_id, num_threads;
 } thread_data_t;
 
 void *multiply_polynomials_parallel(void *arg) {
     thread_data_t *data = (thread_data_t *)arg;
-    int chunk_size = (2 * data->n + 1) / data->num_threads;
-    int start = data->thread_id * chunk_size;
-    int end = (data->thread_id == data->num_threads - 1) ? 
-              (2 * data->n + 1) : (data->thread_id + 1) * chunk_size;
-    
+
+    int size = 2 * data->n + 1;
+    int chunk = (size + data->num_threads - 1) / data->num_threads;
+
+    int start = data->thread_id * chunk;
+    int end = start + chunk;
+    if (end > size) end = size;
+
     for (int k = start; k < end; k++) {
-        for (int i = 0; i <= data->n; i++) {
-            int j = k - i;
-            if (j >= 0 && j <= data->n) {
-                data->C[k] += data->A[i] * data->B[j];
-            }
+
+        int i_start = (k < data->n) ? 0 : k - data->n;
+        int i_end   = (k < data->n) ? k : data->n;
+
+        int sum = 0;
+        for (int i = i_start; i <= i_end; i++) {
+            sum += data->A[i] * data->B[k - i];
         }
+        data->C[k] = sum;
     }
     return NULL;
 }
@@ -46,10 +53,15 @@ int main(int argc, char *argv[]) {
     int *B = malloc((n + 1) * sizeof(int));
     int *C_par = calloc(size, sizeof(int));
     int *C_seq = calloc(size, sizeof(int));
+
+    // Allocate private C arrays
+    int **C_priv = malloc(num_threads * sizeof(int *));
+    for (int i = 0; i < num_threads; i++) {
+        C_priv[i] = calloc(size, sizeof(int));
+    }
     
     gettimeofday(&t_alloc, NULL);
     
-    // Initialize polynomials
     srand(time(NULL));
     for (int i = 0; i <= n; i++) {
         A[i] = (rand() % 9) + 1;
@@ -58,7 +70,6 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_init, NULL);
     
-    // Sequential computation for verification
     struct timeval start_seq, end_seq;
     gettimeofday(&start_seq, NULL);
     for (int i = 0; i <= n; i++) {
@@ -68,7 +79,6 @@ int main(int argc, char *argv[]) {
     }
     gettimeofday(&end_seq, NULL);
     
-    // Parallel computation - thread creation
     pthread_t *threads = malloc(num_threads * sizeof(pthread_t));
     thread_data_t *thread_data = malloc(num_threads * sizeof(thread_data_t));
     
@@ -76,7 +86,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < num_threads; i++) {
         thread_data[i].A = A;
         thread_data[i].B = B;
-        thread_data[i].C = C_par;
+        thread_data[i].C = C_priv[i];   // <-- PRIVATE BUFFER
         thread_data[i].n = n;
         thread_data[i].thread_id = i;
         thread_data[i].num_threads = num_threads;
@@ -85,13 +95,19 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_compute, NULL);
     
-    // Thread join
     for (int i = 0; i < num_threads; i++) {
         pthread_join(threads[i], NULL);
     }
     gettimeofday(&t_join, NULL);
+
+    // NEW: reduce private buffers into final C_par
+    for (int t = 0; t < num_threads; t++) {
+        for (int k = 0; k < size; k++) {
+            C_par[k] += C_priv[t][k];
+        }
+    }
     
-    // Verify results
+    // Verify
     int correct = 1;
     for (int i = 0; i < size; i++) {
         if (C_seq[i] != C_par[i]) {
@@ -101,13 +117,17 @@ int main(int argc, char *argv[]) {
     }
     
     gettimeofday(&t_verify, NULL);
-    
+
+    // free memory
+    for (int i = 0; i < num_threads; i++)
+        free(C_priv[i]);
+    free(C_priv);
+
     free(A); free(B); free(C_par); free(C_seq);
     free(threads); free(thread_data);
     
     gettimeofday(&t_end, NULL);
     
-    // Calculate times
     double time_alloc = (t_alloc.tv_sec - t_start.tv_sec) + (t_alloc.tv_usec - t_start.tv_usec) / 1000000.0;
     double time_init = (t_init.tv_sec - t_alloc.tv_sec) + (t_init.tv_usec - t_alloc.tv_usec) / 1000000.0;
     double time_seq = (end_seq.tv_sec - start_seq.tv_sec) + (end_seq.tv_usec - start_seq.tv_usec) / 1000000.0;
