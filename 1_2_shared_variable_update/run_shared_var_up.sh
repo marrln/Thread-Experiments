@@ -19,7 +19,7 @@ for iterations in 100000 1000000; do
         
         # Sequential baseline
         echo -n "Sequential baseline - "
-        output=$(./seq_shared_var 1 $iterations $threads)
+        output=$(./bin/seq_shared_var 1 $iterations $threads)
         echo "$output"
         echo "sequential,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
         
@@ -30,7 +30,7 @@ for iterations in 100000 1000000; do
             if [ $method -eq 3 ]; then method_name="atomic"; fi
             
             echo -n "Method $method ($method_name) - "
-            output=$(./shared_var $method $iterations $threads)
+            output=$(./bin/shared_var $method $iterations $threads)
             echo "$output"
             echo "$method_name,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
         done

@@ -18,14 +18,14 @@ for degree in 1000 5000 10000; do
     
     # Sequential baseline
     echo -n "Sequential baseline - "
-    output=$(./seq_poly_mult $degree 1)
+    output=$(./bin/seq_poly_mult $degree 1)
     echo "$output"
     echo "$degree,sequential,$output,$RUN_USER" >> $CSV_FILE
     
     # Parallel versions
     for threads in 1 2 4 8; do
         echo -n "Threads: $threads - "
-        output=$(./poly_mult $degree $threads)
+        output=$(./bin/poly_mult $degree $threads)
         echo "$output"
         echo "$degree,$threads,$output,$RUN_USER" >> $CSV_FILE
     done
