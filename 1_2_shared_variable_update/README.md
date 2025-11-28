@@ -3,6 +3,37 @@
 Overview:
 Threads repeatedly update a shared variable; implement versions with no synchronization, with mutex/locks, and with atomic operations, then measure correctness and performance.
 
+Synchronization Methods:
+
+1. **Mutex (Mutual Exclusion Lock)**
+   - Uses `pthread_mutex_lock/unlock` to serialize access to the shared variable
+   - Only one thread can hold the lock at a time
+   - Each thread increments by 1, so atomic operation per iteration is needed
+   - High overhead due to context switching and lock contention
+
+2. **Read-Write Lock (RWLock)**
+   - Uses `pthread_rwlock_wrlock/unlock` for write access
+   - Allows multiple readers but exclusive writer access
+   - In this exercise, only writes occur, so it behaves similarly to mutex
+   - Comparable overhead to mutex since all operations are writes
+
+3. **Atomic Operations**
+   - Uses `__atomic_fetch_add()` with `__ATOMIC_SEQ_CST` memory ordering
+   - Employs local accumulation: each thread counts locally, then atomically adds the total
+   - Single atomic operation per thread instead of per-increment
+   - Significantly lower overhead than mutex/rwlock since synchronization happens once
+
+Why Sequential is Faster:
+
+The sequential baseline is faster because:
+- **No synchronization overhead**: No locks, mutexes, or atomic operations needed
+- **No context switching**: Single thread executes continuously without preemption
+- **No memory bus contention**: No inter-thread communication or cache coherency overhead
+- **Optimal CPU cache utilization**: All data stays in L1/L2 cache
+- **Linear execution**: Pure computation without synchronization delays
+
+The parallel versions must pay the cost of thread creation, coordination, and synchronization. The sequential version is the theoretical minimum for the pure computation work.
+
 Expected Outcome:
 - Unsynchronized updates will produce incorrect results due to races; mutex and atomic variants produce correct results. Atomics often outperform coarse-grained mutexes under light contention.
 
