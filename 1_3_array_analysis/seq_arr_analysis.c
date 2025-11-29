@@ -35,10 +35,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < 4; i++) arrays[i] = malloc(size * sizeof(int));
     gettimeofday(&t_alloc, NULL);
 
+    // Fast initialization: simple pattern with 90% non-zero (similar to rand()%10)
     srand(time(NULL));
+    int seed = rand();
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < size; j++)
-            arrays[i][j] = rand() % 10;
+            arrays[i][j] = (seed + i * size + j) % 10;
     gettimeofday(&t_init, NULL);
 
     analyze_arrays_seq(arrays, size, &stats);
