@@ -14,7 +14,7 @@ if [ ! -f "$CSV_FILE" ]; then
 fi
 
 for iterations in 10000 50000 100000; do
-    for threads in 2 4 8 16; do
+    for threads in 2 4 8; do
         echo "Iterations: $iterations, Threads: $threads"
         
         echo -n "Pthread Barrier: "
