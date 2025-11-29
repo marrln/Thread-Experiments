@@ -159,11 +159,25 @@ int main(int argc, char *argv[]) {
         pthread_mutex_init(&bank_data.global_mutex, NULL);
     } else if (locking_scheme == 2) {
         bank_data.mutexes = malloc(num_accounts * sizeof(pthread_mutex_t));
+        if (!bank_data.mutexes) {
+            fprintf(stderr, "Failed to allocate mutexes\n");
+            free(bank_data.accounts);
+            free(threads);
+            free(thread_data);
+            return 1;
+        }
         for (int i = 0; i < num_accounts; i++) {
             pthread_mutex_init(&bank_data.mutexes[i], NULL);
         }
     } else {
         bank_data.rwlocks = malloc(num_accounts * sizeof(pthread_rwlock_t));
+        if (!bank_data.rwlocks) {
+            fprintf(stderr, "Failed to allocate rwlocks\n");
+            free(bank_data.accounts);
+            free(threads);
+            free(thread_data);
+            return 1;
+        }
         for (int i = 0; i < num_accounts; i++) {
             pthread_rwlock_init(&bank_data.rwlocks[i], NULL);
         }
@@ -176,7 +190,31 @@ int main(int argc, char *argv[]) {
         thread_data[i].bank_data = &bank_data;
         thread_data[i].thread_id = i;
         thread_data[i].query_sum = 0;
-        pthread_create(&threads[i], NULL, bank_thread, &thread_data[i]);
+        if (pthread_create(&threads[i], NULL, bank_thread, &thread_data[i]) != 0) {
+            fprintf(stderr, "Failed to create thread %d\n", i);
+            // Join already created threads
+            for (int j = 0; j < i; j++) {
+                pthread_join(threads[j], NULL);
+            }
+            // Cleanup locks
+            if (locking_scheme == 1) {
+                pthread_mutex_destroy(&bank_data.global_mutex);
+            } else if (locking_scheme == 2) {
+                for (int k = 0; k < num_accounts; k++) {
+                    pthread_mutex_destroy(&bank_data.mutexes[k]);
+                }
+                free(bank_data.mutexes);
+            } else if (locking_scheme == 3) {
+                for (int k = 0; k < num_accounts; k++) {
+                    pthread_rwlock_destroy(&bank_data.rwlocks[k]);
+                }
+                free(bank_data.rwlocks);
+            }
+            free(bank_data.accounts);
+            free(threads);
+            free(thread_data);
+            return 1;
+        }
     }
     gettimeofday(&t_compute, NULL);
     
