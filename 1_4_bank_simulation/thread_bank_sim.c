@@ -21,6 +21,7 @@ typedef struct {
 typedef struct {
     bank_data_t *bank_data;
     int thread_id;
+    int transactions_for_this_thread;
     long query_sum;
 } thread_data_t;
 
@@ -37,10 +38,13 @@ void *bank_thread(void *arg) {
     thread_data_t *data = (thread_data_t *)arg;
     bank_data_t *bank = data->bank_data;
     
-    for (int t = 0; t < bank->transactions_per_thread; t++) {
-        if ((double)rand() / RAND_MAX < bank->query_percentage) {
+    // Thread-local random seed to avoid contention on shared rand() state
+    unsigned int seed = time(NULL) ^ (data->thread_id * 104729);
+    
+    for (int t = 0; t < data->transactions_for_this_thread; t++) {
+        if ((double)rand_r(&seed) / RAND_MAX < bank->query_percentage) {
             // Query transaction
-            int account = rand() % bank->num_accounts;
+            int account = rand_r(&seed) % bank->num_accounts;
             
             if (bank->locking_scheme == 1) { // Coarse-grained
                 pthread_mutex_lock(&bank->global_mutex);
@@ -69,10 +73,10 @@ void *bank_thread(void *arg) {
             }
         } else {
             // Transfer transaction
-            int from = rand() % bank->num_accounts;
-            int to = rand() % bank->num_accounts;
-            while (to == from) to = rand() % bank->num_accounts;
-            int amount = (rand() % 10) + 1;
+            int from = rand_r(&seed) % bank->num_accounts;
+            int to = rand_r(&seed) % bank->num_accounts;
+            while (to == from) to = rand_r(&seed) % bank->num_accounts;
+            int amount = (rand_r(&seed) % 10) + 1;
             
             if (bank->locking_scheme == 1) { // Coarse-grained
                 pthread_mutex_lock(&bank->global_mutex);
@@ -120,16 +124,20 @@ void *bank_thread(void *arg) {
 
 int main(int argc, char *argv[]) {
     if (argc != 6) {
-        printf("Usage: %s <num_accounts> <transactions_per_thread> <query_percentage> <locking_scheme> <num_threads>\n", argv[0]);
+        printf("Usage: %s <num_accounts> <total_transactions> <query_percentage> <locking_scheme> <num_threads>\n", argv[0]);
         printf("Locking schemes: 1-coarse, 2-fine, 3-rwlock\n");
         return 1;
     }
     
     int num_accounts = atoi(argv[1]);
-    int transactions_per_thread = atoi(argv[2]);
+    int total_transactions = atoi(argv[2]);
     double query_percentage = atof(argv[3]);
     int locking_scheme = atoi(argv[4]);
     int num_threads = atoi(argv[5]);
+    
+    // Calculate transactions per thread (divide total work equally)
+    int transactions_per_thread = total_transactions / num_threads;
+    int extra_transactions = total_transactions % num_threads;
     
     struct timeval t_start, t_alloc, t_init, t_create, t_compute, t_join, t_cleanup, t_end;
     
@@ -190,6 +198,8 @@ int main(int argc, char *argv[]) {
         thread_data[i].bank_data = &bank_data;
         thread_data[i].thread_id = i;
         thread_data[i].query_sum = 0;
+        // Distribute extra transactions to first threads
+        thread_data[i].transactions_for_this_thread = transactions_per_thread + (i < extra_transactions ? 1 : 0);
         if (pthread_create(&threads[i], NULL, bank_thread, &thread_data[i]) != 0) {
             fprintf(stderr, "Failed to create thread %d\n", i);
             // Join already created threads

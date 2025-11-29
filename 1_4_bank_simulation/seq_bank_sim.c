@@ -15,15 +15,14 @@ double perform_work(int value) {
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        printf("Usage: %s <num_accounts> <transactions_per_thread> <query_percentage> <num_threads>\n", argv[0]);
+        printf("Usage: %s <num_accounts> <total_transactions> <query_percentage> <num_threads>\n", argv[0]);
         return 1;
     }
     
     int num_accounts = atoi(argv[1]);
-    int transactions_per_thread = atoi(argv[2]);
+    int total_transactions = atoi(argv[2]);
     double query_percentage = atof(argv[3]);
     int num_threads = atoi(argv[4]);
-    int total_transactions = transactions_per_thread * num_threads;
     
     struct timeval t_start, t_alloc, t_init, t_compute, t_end;
     
