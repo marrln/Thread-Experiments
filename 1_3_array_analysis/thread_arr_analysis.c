@@ -51,8 +51,11 @@ int main(int argc, char *argv[]) {
     }
     
     int size = atoi(argv[1]);
-    int *arrays[4];
-    struct array_stats_s stats_seq = {0}, stats_par = {0};
+     int *arrays[4];
+     struct array_stats_s stats_seq = {0};
+     /* Use padded stats struct for parallel results to avoid false sharing
+         between threads writing adjacent struct fields. */
+     struct array_stats_padded_s stats_par = {0};
     
     struct timeval t_start, t_alloc, t_init, t_seq, t_create, t_compute, t_join, t_cleanup, t_end;
     
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
     // Parallel analysis
     pthread_t threads[4];
     thread_data_t thread_data[4];
-    long long *results[4] = {&stats_par.info_array_0, &stats_par.info_array_1, 
+    long long *results[4] = {&stats_par.info_array_0, &stats_par.info_array_1,
                             &stats_par.info_array_2, &stats_par.info_array_3};
     
     gettimeofday(&t_create, NULL);
