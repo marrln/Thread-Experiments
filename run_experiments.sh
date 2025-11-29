@@ -38,8 +38,10 @@ $CC $CFLAGS -o 1_2_shared_variable_update/bin/shared_var \
 
 $CC $CFLAGS -o 1_3_array_analysis/bin/seq_arr_analysis \
 	1_3_array_analysis/seq_arr_analysis.c $LDFLAGS
-$CC $CFLAGS -o 1_3_array_analysis/bin/array_analysis \
-	1_3_array_analysis/thread_arr_analysis.c $LDFLAGS
+$CC $CFLAGS -o 1_3_array_analysis/bin/thread_arr_analysis_unpadded \
+	1_3_array_analysis/thread_arr_analysis_unpadded.c $LDFLAGS
+$CC $CFLAGS -o 1_3_array_analysis/bin/thread_arr_analysis_padded \
+	1_3_array_analysis/thread_arr_analysis_padded.c $LDFLAGS
 
 $CC $CFLAGS -o 1_4_bank_simulation/bin/seq_bank_sim \
 	1_4_bank_simulation/seq_bank_sim.c $LDFLAGS
@@ -116,13 +118,13 @@ echo "Wrote metadata to $METADATA_FILE"
 #echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
 #(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
 
-#echo "Running Exercise 1.3 - Array Analysis Experiments..."
-#(cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
+echo "Running Exercise 1.3 - Array Analysis Experiments..."
+(cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
 
 #echo "Running Exercise 1.4 - Bank Simulation Experiments..."
 #(cd 1_4_bank_simulation && ./run_bank_sim.sh) > "$LOG_DIR/results_1.4_${TS}.txt" 2>&1
 
-echo "Running Exercise 1.5 - Different Barrier Implementations Experiments..."
-(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > "$LOG_DIR/results_1.5_${TS}.txt" 2>&1
+#echo "Running Exercise 1.5 - Different Barrier Implementations Experiments..."
+#(cd 1_5_barrier_implementations && ./run_barrier_impl.sh) > "$LOG_DIR/results_1.5_${TS}.txt" 2>&1
 
 echo "All experiments completed. Logs saved to $LOG_DIR/ (timestamp: $TS)"
