@@ -42,6 +42,8 @@ $CC $CFLAGS -o 1_3_array_analysis/bin/thread_arr_analysis_unpadded \
 	1_3_array_analysis/thread_arr_analysis_unpadded.c $LDFLAGS
 $CC $CFLAGS -o 1_3_array_analysis/bin/thread_arr_analysis_padded \
 	1_3_array_analysis/thread_arr_analysis_padded.c $LDFLAGS
+$CC $CFLAGS -o 1_3_array_analysis/bin/thread_arr_analysis_local_accum \
+	1_3_array_analysis/thread_arr_analysis_local_accum.c $LDFLAGS
 
 $CC $CFLAGS -o 1_4_bank_simulation/bin/seq_bank_sim \
 	1_4_bank_simulation/seq_bank_sim.c $LDFLAGS
@@ -116,10 +118,34 @@ echo "Wrote metadata to $METADATA_FILE"
 # done
 
 #echo "Running Exercise 1.2 - Shared Variable Update Experiments..."
-#(cd 1_2_shared_variable_update && ./run_shared_var_up.sh) > "$LOG_DIR/results_1.2_${TS}.txt" 2>&1
+#for i in $(seq 1 5); do
+#	RUN_LOG="$LOG_DIR/results_1.2_${TS}_run${i}.txt"
+#	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
+#	if (cd 1_2_shared_variable_update && ./run_shared_var_up.sh) >> "$RUN_LOG" 2>&1; then
+#		echo "Run $i completed successfully" >> "$RUN_LOG"
+#	else
+#		echo "Run $i FAILED" >> "$RUN_LOG"
+#	fi
+#	echo "===== End Run $i =====" >> "$RUN_LOG"
+#	# append this run to aggregate file
+#	cat "$RUN_LOG" >> "$LOG_DIR/results_1.2_${TS}.txt"
+#	echo >> "$LOG_DIR/results_1.2_${TS}.txt"
+#done
 
 echo "Running Exercise 1.3 - Array Analysis Experiments..."
-(cd 1_3_array_analysis && ./run_arr_analysis.sh) > "$LOG_DIR/results_1.3_${TS}.txt" 2>&1
+for i in $(seq 1 5); do
+	RUN_LOG="$LOG_DIR/results_1.3_${TS}_run${i}.txt"
+	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
+	if (cd 1_3_array_analysis && ./run_arr_analysis.sh) >> "$RUN_LOG" 2>&1; then
+		echo "Run $i completed successfully" >> "$RUN_LOG"
+	else
+		echo "Run $i FAILED" >> "$RUN_LOG"
+	fi
+	echo "===== End Run $i =====" >> "$RUN_LOG"
+	# append this run to aggregate file
+	cat "$RUN_LOG" >> "$LOG_DIR/results_1.3_${TS}.txt"
+	echo >> "$LOG_DIR/results_1.3_${TS}.txt"
+done
 
 #echo "Running Exercise 1.4 - Bank Simulation Experiments..."
 #(cd 1_4_bank_simulation && ./run_bank_sim.sh) > "$LOG_DIR/results_1.4_${TS}.txt" 2>&1
