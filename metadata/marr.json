@@ -1,0 +1,12 @@
+{
+	"user": "marr",
+	"collected_at": "2025-11-29T16:02:09Z",
+	"host": "marr-linux",
+	"os": "Ubuntu 24.04.3 LTS",
+	"cpu_model": "12th Gen Intel(R) Core(TM) i5-12600KF",
+	"n_logical_cpus": 8,
+	"mem_kb": 16376208,
+	"compiler": "gcc",
+	"compiler_flags": "-Wall -O2 -pthread",
+	"git_commit": "3f7c555"
+}
