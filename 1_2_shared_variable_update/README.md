@@ -41,33 +41,35 @@ Answer to Handout Questions:
 Results Analysis Across Workloads:
 
 **100K Iterations (Overhead-Dominated)**
-- Sequential baseline: ~0 seconds (negligible workload)
-- At 1 thread: All methods show similar times (~0.0001-0.0002s)
-- At 16 threads: Atomic ~0.049s, Mutex ~0.001s (mutex faster due to lower thread scheduling overhead)
-- Overhead dominates; parallelism adds thread creation/coordination cost without computation benefit
+- At 1 thread: Atomic ~0.20ms, Mutex ~0.20ms, RWlock ~0.21ms (all similar; minimal parallelism benefit)
+- At 2 threads: Atomic ~0.15ms, Mutex ~0.10ms, RWlock ~0.18ms (negligible speedup)
+- At 4 threads: Atomic ~1.16ms, Mutex ~0.34ms, RWlock ~0.22ms (mutex and rwlock outperform due to lower thread overhead)
+- At 8 threads: Atomic ~3.04ms, Mutex ~5.10ms, RWlock ~2.81ms (contention visible; thread coordination costs exceed benefit)
+- At 16 threads: Atomic ~6.95ms, Mutex ~3.21ms, RWlock ~3.38ms (atomic memory contention; mutex/rwlock better at high thread count for small workload)
+- Pattern: Small workload means thread overhead dominates; atomic's per-thread operation costs more than mutex's serialization overhead
 
 **1M Iterations (Parallelism Emerging)**
-- Sequential baseline: ~0 seconds
-- At 1 thread: All methods ~0.0001-0.0003s
-- At 4 threads: Atomic ~0.0005s, Mutex ~0.0009s (atomic begins to show advantage)
-- At 8 threads: Atomic ~0.0013s, Mutex ~0.0167s (4× advantage for atomic); RWlock ~0.048s (lock queuing)
-- At 16 threads: Atomic ~0.070s, Mutex ~0.005s (atomic shows occasional degradation due to memory contention; phoebus user gets ~0.0007s for atomic—strong system-dependent variance)
-- RWlock consistently poor for write-only workload; doesn't benefit from reader optimization
+- At 1 thread: Atomic ~0.69ms, Mutex ~0.15ms, RWlock ~0.17ms (variation expected; atomic uses sequential CAS operations)
+- At 2 threads: Atomic ~0.12ms, Mutex ~0.10ms, RWlock ~0.16ms (atomic becomes competitive; batching reduces contention)
+- At 4 threads: Atomic ~0.16ms, Mutex ~0.33ms, RWlock ~0.55ms (atomic advantage emerges; RWlock write-lock overhead visible)
+- At 8 threads: Atomic ~2.53ms, Mutex ~2.01ms, RWlock ~7.07ms (atomic competitive; RWlock severely degrades at higher threads)
+- At 16 threads: Atomic ~3.89ms, Mutex ~3.68ms, RWlock ~6.44ms (atomic and mutex nearly identical; atomic memory contention vs mutex lock contention roughly equal)
+- Key: At sufficient workload, atomic and mutex perform similarly, but both beat RWlock for write-only operations
 
-Cross-Machine Behavior:
-- Marr user: Median compute times ~0.0005-0.020s across configurations
-- Phoebus user: Median compute times ~0.0001-0.0007s (faster system, lower absolute times)
-- Both machines show identical relative performance: atomic > mutex > rwlock
-- Variance suggests background load on marr user's system; phoebus provides cleaner measurements
+Marr vs Phoebus System Differences:
+- Marr (primary system): 100K at 16 threads shows atomic ~6.95ms degradation
+- Phoebus (faster system): Similar relative patterns but lower absolute times
+- Both show: atomic < mutex < rwlock for write-only workload when workload is sufficient
+- System differences more pronounced at small iteration counts; both converge to similar behavior at 1M iterations
 
 Key Insight:
 Atomic operations shine when compute work is substantial (1M+ iterations). At low iteration counts, thread overhead and memory contention dominate parallelism benefits. The batching pattern is universal across all three synchronization methods—local accumulation enables practical scaling.
 
 Plots:
-- ![plot](plots/plot_1_2_marr_iter100K.png) - Marr user, 100K iterations. Shows thread overhead exceeding parallelism gains; atomic's memory contention visible at 16 threads. Compare compute time (left) vs total time (right)—thread creation dominates.
-- ![plot](plots/plot_1_2_marr_iter1M.png) - Marr user, 1M iterations. Atomic and mutex converge at low threads; atomic scales better at 8-16 threads. RWlock write-lock overhead clear—flat performance across threads despite increased iterations.
-- ![plot](plots/plot_1_2_phoebus_iter100K.png) - Phoebus user, 100K iterations. Cleaner data (less system noise). Atomic shows ~2-3ms overhead at 16 threads; mutex surprisingly competitive, suggesting different CPU caching behavior.
-- ![plot](plots/plot_1_2_phoebus_iter1M.png) - Phoebus user, 1M iterations. Atomic ~0.0007s at 16 threads (excellent); mutex ~0.0008s; RWlock degrades to ~0.0008s (unexpected—suggests phoebus system has write-lock optimization not seen in marr user).
-- ![plot](plots/plot_1_2_all_users_iter100K.png) - Combined 100K results. Phoebus' efficiency visible; marr shows higher variance due to system load.
-- ![plot](plots/plot_1_2_all_users_iter1M.png) - Combined 1M results. Phoebus atomic achieves ~0.0007s; marr atomic achieves ~0.020s at 16 threads. Same algorithmic pattern, 30× hardware speed difference highlights importance of benchmarking on target systems.
+- ![plot](plots/plot_1_2_marr_iter100K.png) - Marr user, 100K iterations. Shows thread overhead for small workload; atomic peaks at ~6.95ms (16 threads), mutex stays low (~3.21ms at 16 threads), RWlock similar to mutex. Thread coordination costs dominate computation time; parallelism provides no benefit.
+- ![plot](plots/plot_1_2_marr_iter1M.png) - Marr user, 1M iterations. Atomic ~3.89ms at 16 threads, Mutex ~3.68ms, RWlock ~6.44ms. Atomic and mutex converge to similar performance; both outperform RWlock write-lock overhead by 1.7×. Demonstrates atomic optimization benefits at higher workload.
+- ![plot](plots/plot_1_2_phoebus_iter100K.png) - Phoebus user, 100K iterations. Cleaner measurements (less system noise). Atomic shows lower absolute overhead than marr (~1-2ms range vs marr's ~7ms at 16 threads), but same pattern: mutex/rwlock outperform atomic for small workloads.
+- ![plot](plots/plot_1_2_phoebus_iter1M.png) - Phoebus user, 1M iterations. Atomic and mutex again converge (~0.3-0.4ms range at higher threads), showing consistent behavior across systems. RWlock consistently 1.5-2× worse than atomic/mutex.
+- ![plot](plots/plot_1_2_all_users_iter100K.png) - Combined 100K results. Marr vs phoebus show system-dependent behavior for small workloads; phoebus more efficient but patterns similar. Thread overhead prevents parallelism benefits.
+- ![plot](plots/plot_1_2_all_users_iter1M.png) - Combined 1M results. Convergence of atomic and mutex visible across both systems. Sufficient workload masks synchronization method differences; batching optimization dominates performance.
 
