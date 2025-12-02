@@ -1,0 +1,12 @@
+{
+	"user": "ea24205",
+	"collected_at": "2025-12-02T14:18:37Z",
+	"host": "linux25",
+	"os": "Ubuntu 20.04.6 LTS",
+	"cpu_model": "Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz",
+	"n_logical_cpus": 4,
+	"mem_kb": 16242676,
+	"compiler": "gcc",
+	"compiler_flags": "-Wall -O2 -pthread",
+	"git_commit": "b83ce81"
+}
