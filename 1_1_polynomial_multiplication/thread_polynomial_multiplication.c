@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     int num_threads = atoi(argv[2]);
     int size = 2 * n + 1;
     
-    struct timeval t_start, t_alloc, t_init, t_create, t_compute, t_join, t_verify, t_end;
+    struct timeval t_start, t_alloc, t_init, t_create, t_compute, t_join, t_reduce_start, t_reduce_end, t_verify_start, t_verify_end, t_cleanup, t_end;
     
     gettimeofday(&t_start, NULL);
     
@@ -89,16 +89,44 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < num_threads; i++) {
         pthread_join(threads[i], NULL);
     }
+    
     gettimeofday(&t_join, NULL);
+    gettimeofday(&t_reduce_start, NULL);
 
-    // NEW: reduce private buffers into final C_par
+    // Reduce private buffers into final C_par
     for (int t = 0; t < num_threads; t++) {
         for (int k = 0; k < size; k++) {
             C_par[k] += C_priv[t][k];
         }
     }
     
-    gettimeofday(&t_verify, NULL);
+    gettimeofday(&t_reduce_end, NULL);
+    gettimeofday(&t_verify_start, NULL);
+    
+    // Verify correctness by computing sequential version
+    int *C_expected = calloc(size, sizeof(int));
+    for (int k = 0; k < size; k++) {
+        int i_start = (k < n) ? 0 : k - n;
+        int i_end   = (k < n) ? k : n;
+        
+        int sum = 0;
+        for (int i = i_start; i <= i_end; i++) {
+            sum += A[i] * B[k - i];
+        }
+        C_expected[k] = sum;
+    }
+    
+    int verification_passed = 1;
+    for (int k = 0; k < size; k++) {
+        if (C_par[k] != C_expected[k]) {
+            verification_passed = 0;
+            break;
+        }
+    }
+    
+    free(C_expected);
+    gettimeofday(&t_verify_end, NULL);
+    gettimeofday(&t_cleanup, NULL);
 
     // free memory
     for (int i = 0; i < num_threads; i++)
@@ -112,16 +140,18 @@ int main(int argc, char *argv[]) {
     
     double time_alloc = (t_alloc.tv_sec - t_start.tv_sec) + (t_alloc.tv_usec - t_start.tv_usec) / 1000000.0;
     double time_init = (t_init.tv_sec - t_alloc.tv_sec) + (t_init.tv_usec - t_alloc.tv_usec) / 1000000.0;
-    double time_seq = 0.0; // placeholder: sequential baseline is measured by separate binary
     double time_create = (t_compute.tv_sec - t_create.tv_sec) + (t_compute.tv_usec - t_create.tv_usec) / 1000000.0;
     double time_compute = (t_join.tv_sec - t_compute.tv_sec) + (t_join.tv_usec - t_compute.tv_usec) / 1000000.0;
-    double time_join = (t_verify.tv_sec - t_join.tv_sec) + (t_verify.tv_usec - t_join.tv_usec) / 1000000.0;
-    double time_verify = (t_end.tv_sec - t_verify.tv_sec) + (t_end.tv_usec - t_verify.tv_usec) / 1000000.0;
+    double time_join = (t_reduce_start.tv_sec - t_join.tv_sec) + (t_reduce_start.tv_usec - t_join.tv_usec) / 1000000.0;
+    double time_reduce = (t_reduce_end.tv_sec - t_reduce_start.tv_sec) + (t_reduce_end.tv_usec - t_reduce_start.tv_usec) / 1000000.0;
+    double time_verify = (t_verify_end.tv_sec - t_verify_start.tv_sec) + (t_verify_end.tv_usec - t_verify_start.tv_usec) / 1000000.0;
+    double time_cleanup = (t_end.tv_sec - t_cleanup.tv_sec) + (t_end.tv_usec - t_cleanup.tv_usec) / 1000000.0;
     double time_total = (t_end.tv_sec - t_start.tv_sec) + (t_end.tv_usec - t_start.tv_usec) / 1000000.0;
     
-            printf("%f,%f,%f,%f,%f,%f,%f,%f\n",
-                time_alloc, time_init, time_seq, time_create,
-                time_compute, time_join, time_verify, time_total);
+    printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
+        time_alloc, time_init, time_create,
+        time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+        verification_passed ? "PASS" : "FAIL");
     
     return 0;
 }

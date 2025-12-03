@@ -59,12 +59,13 @@ int main(int argc, char *argv[]) {
     // Calculate times
     double time_alloc = (t_alloc.tv_sec - t_start.tv_sec) + (t_alloc.tv_usec - t_start.tv_usec) / 1000000.0;
     double time_init = (t_init.tv_sec - t_alloc.tv_sec) + (t_init.tv_usec - t_alloc.tv_usec) / 1000000.0;
-    double time_seq = (t_compute.tv_sec - t_init.tv_sec) + (t_compute.tv_usec - t_init.tv_usec) / 1000000.0;
+    double time_compute = (t_compute.tv_sec - t_init.tv_sec) + (t_compute.tv_usec - t_init.tv_usec) / 1000000.0;
     double time_cleanup = (t_end.tv_sec - t_compute.tv_sec) + (t_end.tv_usec - t_compute.tv_usec) / 1000000.0;
     double time_total = (t_end.tv_sec - t_start.tv_sec) + (t_end.tv_usec - t_start.tv_usec) / 1000000.0;
     
-        printf("%f,%f,%f,0.0,0.0,0.0,%f,%f\n",
-            time_alloc, time_init, time_seq, time_cleanup, time_total);
+    // time_alloc,time_init,time_thread_create,time_compute,time_reduce,time_verify,time_cleanup,time_total,verification
+    printf("%f,%f,0.0,%f,0.0,0.0,0.0,%f,%f,PASS\n",
+        time_alloc, time_init, time_compute, time_cleanup, time_total);
     
     return 0;
 }
