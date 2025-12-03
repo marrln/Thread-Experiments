@@ -107,11 +107,11 @@ for i in $(seq 1 5); do
 	RUN_LOG="$LOG_DIR/results_1.1_${TS}_run${i}.txt"
 	echo "Run $i/10 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
 	if (cd 1_1_polynomial_multiplication && ./run_poly_mult.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
+		echo "Run $i completed successfully" | tee -a "$RUN_LOG"
 	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
+		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
+	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.1_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.1_${TS}.txt"
@@ -122,11 +122,11 @@ for i in $(seq 1 5); do
 	RUN_LOG="$LOG_DIR/results_1.2_${TS}_run${i}.txt"
 	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
 	if (cd 1_2_shared_variable_update && ./run_shared_var_up.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
+		echo "Run $i completed successfully" | tee -a "$RUN_LOG"
 	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
+		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
+	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.2_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.2_${TS}.txt"
@@ -137,11 +137,11 @@ for i in $(seq 1 5); do
 	RUN_LOG="$LOG_DIR/results_1.3_${TS}_run${i}.txt"
 	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
 	if (cd 1_3_array_analysis && ./run_arr_analysis.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
+		echo "Run $i completed successfully" | tee -a "$RUN_LOG"
 	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
+		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
+	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.3_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.3_${TS}.txt"
@@ -152,11 +152,11 @@ for i in $(seq 1 5); do
 	RUN_LOG="$LOG_DIR/results_1.4_${TS}_run${i}.txt"
 	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
 	if (cd 1_4_bank_simulation && ./run_bank_sim.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
+		echo "Run $i completed successfully" | tee -a "$RUN_LOG"
 	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
+		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
+	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.4_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.4_${TS}.txt"
@@ -167,11 +167,11 @@ for i in $(seq 1 5); do
 	RUN_LOG="$LOG_DIR/results_1.5_${TS}_run${i}.txt"
 	echo "Run $i/5 - $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$RUN_LOG"
 	if (cd 1_5_barrier_implementations && ./run_barrier_impl.sh) >> "$RUN_LOG" 2>&1; then
-		echo "Run $i completed successfully" >> "$RUN_LOG"
+		echo "Run $i completed successfully" | tee -a "$RUN_LOG"
 	else
-		echo "Run $i FAILED" >> "$RUN_LOG"
+		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" >> "$RUN_LOG"
+	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.5_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.5_${TS}.txt"
