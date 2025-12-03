@@ -39,11 +39,11 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_alloc, NULL);
     
-    // Initialize polynomials with random non-zero coefficients
-    srand(time(NULL));
+    // Use fixed seed for reproducible results matching parallel version
+    unsigned int seed = 42;
     for (int i = 0; i <= n; i++) {
-        A[i] = (rand() % 9) + 1; // 1-9
-        B[i] = (rand() % 9) + 1;
+        A[i] = (rand_r(&seed) % 9) + 1; // 1-9
+        B[i] = (rand_r(&seed) % 9) + 1;
     }
     
     gettimeofday(&t_init, NULL);

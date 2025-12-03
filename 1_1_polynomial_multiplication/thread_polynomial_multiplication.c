@@ -61,10 +61,11 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_alloc, NULL);
     
-    srand(time(NULL));
+    // Use fixed seed for reproducible results matching sequential version
+    unsigned int seed = 42;
     for (int i = 0; i <= n; i++) {
-        A[i] = (rand() % 9) + 1;
-        B[i] = (rand() % 9) + 1;
+        A[i] = (rand_r(&seed) % 9) + 1;
+        B[i] = (rand_r(&seed) % 9) + 1;
     }
     
     gettimeofday(&t_init, NULL);
