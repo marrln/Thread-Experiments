@@ -111,7 +111,6 @@ for i in $(seq 1 5); do
 	else
 		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.1_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.1_${TS}.txt"
@@ -126,7 +125,6 @@ for i in $(seq 1 5); do
 	else
 		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.2_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.2_${TS}.txt"
@@ -141,7 +139,6 @@ for i in $(seq 1 5); do
 	else
 		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.3_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.3_${TS}.txt"
@@ -156,7 +153,6 @@ for i in $(seq 1 5); do
 	else
 		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.4_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.4_${TS}.txt"
@@ -171,7 +167,6 @@ for i in $(seq 1 5); do
 	else
 		echo "Run $i FAILED" | tee -a "$RUN_LOG"
 	fi
-	echo "===== End Run $i =====" | tee -a "$RUN_LOG"
 	# append this run to aggregate file
 	cat "$RUN_LOG" >> "$LOG_DIR/results_1.5_${TS}.txt"
 	echo >> "$LOG_DIR/results_1.5_${TS}.txt"
