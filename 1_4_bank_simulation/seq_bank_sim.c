@@ -33,18 +33,21 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_alloc, NULL);
     
-    srand(time(NULL));
+    // Use fixed seed for initial accounts to match parallel version
+    unsigned int init_seed = 42;
     for (int i = 0; i < num_accounts; i++) {
-        accounts[i] = (rand() % 100) + 1; // Initial balance 1-100
+        accounts[i] = (rand_r(&init_seed) % 100) + 1; // Initial balance 1-100
     }
     
     gettimeofday(&t_init, NULL);
     
+    // Use fixed seed for reproducible random sequence matching parallel version
+    unsigned int seed = 12345;
     long query_sum = 0;
     for (int t = 0; t < total_transactions; t++) {
-        if ((double)rand() / RAND_MAX < query_percentage) {
+        if ((double)rand_r(&seed) / RAND_MAX < query_percentage) {
             // Query transaction
-            int account = rand() % num_accounts;
+            int account = rand_r(&seed) % num_accounts;
             int balance = accounts[account];
             
             // Perform work with the balance value
@@ -52,10 +55,10 @@ int main(int argc, char *argv[]) {
             query_sum += balance;
         } else {
             // Transfer transaction
-            int from = rand() % num_accounts;
-            int to = rand() % num_accounts;
-            while (to == from) to = rand() % num_accounts;
-            int amount = (rand() % 10) + 1;
+            int from = rand_r(&seed) % num_accounts;
+            int to = rand_r(&seed) % num_accounts;
+            while (to == from) to = rand_r(&seed) % num_accounts;
+            int amount = (rand_r(&seed) % 10) + 1;
             
             if (accounts[from] >= amount) {
                 accounts[from] -= amount;

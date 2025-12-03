@@ -38,8 +38,8 @@ void *bank_thread(void *arg) {
     thread_data_t *data = (thread_data_t *)arg;
     bank_data_t *bank = data->bank_data;
     
-    // Thread-local random seed to avoid contention on shared rand() state
-    unsigned int seed = time(NULL) ^ (data->thread_id * 104729);
+    // Use deterministic seed based on thread_id for reproducible sequence
+    unsigned int seed = 12345 + (data->thread_id * 104729);
     
     for (int t = 0; t < data->transactions_for_this_thread; t++) {
         if ((double)rand_r(&seed) / RAND_MAX < bank->query_percentage) {
@@ -157,9 +157,10 @@ int main(int argc, char *argv[]) {
     
     gettimeofday(&t_alloc, NULL);
     
-    srand(time(NULL));
+    // Use fixed seed for initial accounts to match sequential version
+    unsigned int init_seed = 42;
     for (int i = 0; i < num_accounts; i++) {
-        bank_data.accounts[i] = (rand() % 100) + 1; // Initial balance 1-100
+        bank_data.accounts[i] = (rand_r(&init_seed) % 100) + 1; // Initial balance 1-100
     }
     
     // Initialize locks based on scheme
