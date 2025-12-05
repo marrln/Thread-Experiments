@@ -31,8 +31,6 @@ $CC $CFLAGS -o 1_1_polynomial_multiplication/bin/seq_poly_mult \
 $CC $CFLAGS -o 1_1_polynomial_multiplication/bin/poly_mult \
 	1_1_polynomial_multiplication/thread_polynomial_multiplication.c $LDFLAGS
 
-$CC $CFLAGS -o 1_2_shared_variable_update/bin/seq_shared_var \
-	1_2_shared_variable_update/seq_shared_var_up.c $LDFLAGS
 $CC $CFLAGS -o 1_2_shared_variable_update/bin/shared_var \
 	1_2_shared_variable_update/thread_shared_var_up.c $LDFLAGS
 
