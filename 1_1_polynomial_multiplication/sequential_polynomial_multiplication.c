@@ -6,11 +6,9 @@
 void multiply_polynomials_seq(int *A, int *B, int *C, int n) {
     int size = 2 * n + 1;
     
-    // Same algorithm as threaded version: accumulate in local variable, write once
     for (int k = 0; k < size; k++) {
         int i_start = (k < n) ? 0 : k - n;
-        int i_end   = (k < n) ? k : n;
-        
+        int i_end   = (k < n) ? k : n;    
         int sum = 0;
         for (int i = i_start; i <= i_end; i++) {
             sum += A[i] * B[k - i];
