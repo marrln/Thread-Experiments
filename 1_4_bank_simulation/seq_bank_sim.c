@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     int num_accounts = atoi(argv[1]);
     int total_transactions = atoi(argv[2]);
     double query_percentage = atof(argv[3]);
-    int num_threads = atoi(argv[4]);
+    // int num_threads = atoi(argv[4]); // Not used in sequential version
     
     struct timeval t_start, t_alloc, t_init, t_compute, t_end;
     
