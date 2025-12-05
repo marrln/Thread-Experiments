@@ -10,7 +10,6 @@ struct array_stats_s {
     long long int info_array_3;
 };
 
-/* Sequential analysis: count non-zero elements per array */
 void analyze_arrays_seq(int **arrays, int size, struct array_stats_s *stats)
 {
     long long count;
