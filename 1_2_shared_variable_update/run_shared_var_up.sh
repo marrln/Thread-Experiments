@@ -16,20 +16,7 @@ fi
 for iterations in 100000 1000000; do
     for threads in 1 2 4 8 16; do
         echo "Iterations: $iterations, Threads: $threads"
-        
-        # Sequential baseline
-        echo -n "Sequential baseline - "
-        timeout 60 ./bin/seq_shared_var 1 $iterations $threads > /tmp/seq_output.txt 2>&1
-        if [ $? -eq 124 ]; then
-            echo "TIMEOUT (exceeded 60s)"
-            echo "sequential,$iterations,$threads,TIMEOUT,0,0,0,0,0,0,TIMEOUT,$RUN_USER" >> $CSV_FILE
-        else
-            output=$(cat /tmp/seq_output.txt)
-            echo "$output"
-            echo "sequential,$iterations,$threads,$output,$RUN_USER" >> $CSV_FILE
-        fi
-        
-        # Parallel methods
+
         for method in 1 2 3; do
             method_name="mutex"
             if [ $method -eq 2 ]; then method_name="rwlock"; fi
