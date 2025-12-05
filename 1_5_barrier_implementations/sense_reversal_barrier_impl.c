@@ -20,24 +20,19 @@ void sense_barrier_init(sense_barrier_t *barrier, int count) {
 
 void sense_barrier_wait(sense_barrier_t *barrier, int *local_sense) {
     *local_sense = !(*local_sense);
+    int my_sense = *local_sense;
     
     pthread_mutex_lock(&barrier->mutex);
     barrier->waiting++;
     
     if (barrier->waiting == barrier->count) {
         barrier->waiting = 0;
-        barrier->sense = *local_sense;
+        barrier->sense = my_sense;
         pthread_mutex_unlock(&barrier->mutex);
     } else {
-        int my_sense = *local_sense;
         pthread_mutex_unlock(&barrier->mutex);
-        while (1) {
-            pthread_mutex_lock(&barrier->mutex);
-            if (barrier->sense == my_sense) {
-                pthread_mutex_unlock(&barrier->mutex);
-                break;
-            }
-            pthread_mutex_unlock(&barrier->mutex);
+        while (barrier->sense != my_sense) {
+            // Busy wait - reads are safe without lock
         }
     }
 }
