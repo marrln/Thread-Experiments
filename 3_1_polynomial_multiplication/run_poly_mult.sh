@@ -25,7 +25,7 @@ for degree in 5000 20000 80000 100000; do
     # Parallel versions
     for threads in 1 2 4 8 16; do
         echo -n "Threads: $threads - "
-        output=$(./bin/poly_mult $degree $threads)
+        output=$(mpirun -np $threads ./bin/thread_poly_mult $degree)
         echo "$output"
         echo "$degree,$threads,$output,$RUN_USER" >> $CSV_FILE
     done
