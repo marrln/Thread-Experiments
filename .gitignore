@@ -4,6 +4,12 @@
 1_3_array_analysis/bin/*
 1_4_bank_simulation/bin/*
 1_5_barrier_implementations/bin/*
+2_1_polynomial_multiplication/bin/*
+2_2_sparse_array_vector_multiplication/bin/*
+2_3_mergesort/bin/*
+3_1_polynomial_multiplication/bin/*
+3_2_sparse_matrix_vector_multiplication/bin/*
+3_3_is_2_2_and_3_2_hybrid/bin/*
 
 # Ignore build artifacts and temporary files
 /.vscode
