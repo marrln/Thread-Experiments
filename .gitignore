@@ -16,6 +16,9 @@
 /.github
 logs/*
 
+# Ignore venv directories
+.venv/
+
 # Compiled Object files and Executables
 git
 
