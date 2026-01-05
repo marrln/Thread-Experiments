@@ -1,69 +1,117 @@
 CC = gcc
-CFLAGS = -Wall -O2 -pthread
+
+# Core flag sets (use only three main variables)
+CFLAGS_COMMON = -Wall -O2 -pthread
+CFLAGS_OPENMP = $(CFLAGS_COMMON) -fopenmp
+CFLAGS_MPI    = -Wall -O2
+
+# LDFLAGS default
 LDFLAGS = -pthread -lm
 
-# Per-experiment bin directories
-BIN1 = 1_1_polynomial_multiplication/bin
-BIN2 = 1_2_shared_variable_update/bin
-BIN3 = 1_3_array_analysis/bin
-BIN4 = 1_4_bank_simulation/bin
-BIN5 = 1_5_barrier_implementations/bin
+# MPI compiler
+MPICC = mpicc
 
-all: $(BIN1) $(BIN2) $(BIN3) $(BIN4) $(BIN5) \
-    $(BIN1)/seq_poly_mult $(BIN1)/poly_mult \
-    $(BIN2)/seq_shared_var $(BIN2)/shared_var \
-    $(BIN3)/seq_arr_analysis $(BIN3)/thread_arr_analysis_unpadded $(BIN3)/thread_arr_analysis_padded $(BIN3)/thread_arr_analysis_local_accum \
-    $(BIN4)/seq_bank_sim $(BIN4)/bank_sim \
-    $(BIN5)/barrier_pthread $(BIN5)/barrier_cond $(BIN5)/barrier_sense
+# Backwards compat: set CFLAGS to common unless overridden
+CFLAGS ?= $(CFLAGS_COMMON)
 
-$(BIN1) $(BIN2) $(BIN3) $(BIN4) $(BIN5):
+# Per-experiment bin directories (descriptive variable names)
+BIN_1_1 = 1_1_polynomial_multiplication/bin
+BIN_1_2 = 1_2_shared_variable_update/bin
+BIN_1_3 = 1_3_array_analysis/bin
+BIN_1_4 = 1_4_bank_simulation/bin
+BIN_1_5 = 1_5_barrier_implementations/bin
+BIN_2_2 = 2_2_sparse_array_vector_multiplication/bin
+BIN_3_2 = 3_2_sparse_array_vector_nultiplication/bin
+BIN_2_1 = 2_1_polynomial_multiplication/bin
+BIN_2_3 = 2_3_mergesort/bin
+BIN_3_1 = 3_1_polynomial_multiplication/bin
+BIN_3_3 = 3_3_is_2_2_and_3_2_hybrid/bin
+
+all: $(BIN_1_1) $(BIN_1_2) $(BIN_1_3) $(BIN_1_4) $(BIN_1_5) $(BIN_2_2) $(BIN_3_2) $(BIN_2_1) $(BIN_2_3) $(BIN_3_1) $(BIN_3_3) \
+	$(BIN_1_1)/seq_poly_mult $(BIN_1_1)/poly_mult \
+	$(BIN_1_2)/seq_shared_var $(BIN_1_2)/shared_var \
+	$(BIN_1_3)/seq_arr_analysis $(BIN_1_3)/thread_arr_analysis_unpadded $(BIN_1_3)/thread_arr_analysis_padded $(BIN_1_3)/thread_arr_analysis_local_accum \
+	$(BIN_1_4)/seq_bank_sim $(BIN_1_4)/bank_sim \
+	$(BIN_1_5)/barrier_pthread $(BIN_1_5)/barrier_cond $(BIN_1_5)/barrier_sense $(BIN_2_2)/sparse_arr_vector_mult $(BIN_3_2)/sparse_arr_vector_mult \
+	$(BIN_2_1)/seq_poly_mult $(BIN_2_1)/poly_mult $(BIN_2_3)/mergesort $(BIN_3_1)/seq_poly_mult $(BIN_3_1)/thread_poly_mult $(BIN_3_3)/sparse_arr_vector_mult
+$(BIN_1_1) $(BIN_1_2) $(BIN_1_3) $(BIN_1_4) $(BIN_1_5) $(BIN_2_2) $(BIN_3_2) $(BIN_2_1) $(BIN_2_3) $(BIN_3_1) $(BIN_3_3):
 	mkdir -p $@
 
 # 1.1 Polynomial multiplication
-$(BIN1)/seq_poly_mult: 1_1_polynomial_multiplication/sequential_polynomial_multiplication.c | $(BIN1)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_1)/seq_poly_mult: 1_1_polynomial_multiplication/sequential_polynomial_multiplication.c | $(BIN_1_1)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
 
-$(BIN1)/poly_mult: 1_1_polynomial_multiplication/thread_polynomial_multiplication.c | $(BIN1)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_1)/poly_mult: 1_1_polynomial_multiplication/thread_polynomial_multiplication.c | $(BIN_1_1)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
 
 # 1.2 Shared variable update
-$(BIN2)/seq_shared_var: 1_2_shared_variable_update/seq_shared_var_up.c | $(BIN2)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_2)/seq_shared_var: 1_2_shared_variable_update/seq_shared_var_up.c | $(BIN_1_2)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
 
-$(BIN2)/shared_var: 1_2_shared_variable_update/thread_shared_var_up.c | $(BIN2)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_2)/shared_var: 1_2_shared_variable_update/thread_shared_var_up.c | $(BIN_1_2)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
 # 1.3 Array analysis (multiple thread variants)
-$(BIN3)/seq_arr_analysis: 1_3_array_analysis/seq_arr_analysis.c | $(BIN3)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_3)/seq_arr_analysis: 1_3_array_analysis/seq_arr_analysis.c | $(BIN_1_3)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
 
-$(BIN3)/thread_arr_analysis_unpadded: 1_3_array_analysis/thread_arr_analysis_unpadded.c | $(BIN3)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_3)/thread_arr_analysis_unpadded: 1_3_array_analysis/thread_arr_analysis_unpadded.c | $(BIN_1_3)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
-$(BIN3)/thread_arr_analysis_padded: 1_3_array_analysis/thread_arr_analysis_padded.c | $(BIN3)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_3)/thread_arr_analysis_padded: 1_3_array_analysis/thread_arr_analysis_padded.c | $(BIN_1_3)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
-$(BIN3)/thread_arr_analysis_local_accum: 1_3_array_analysis/thread_arr_analysis_local_accum.c | $(BIN3)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_3)/thread_arr_analysis_local_accum: 1_3_array_analysis/thread_arr_analysis_local_accum.c | $(BIN_1_3)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
 # 1.4 Bank simulation
-$(BIN4)/seq_bank_sim: 1_4_bank_simulation/seq_bank_sim.c | $(BIN4)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_4)/seq_bank_sim: 1_4_bank_simulation/seq_bank_sim.c | $(BIN_1_4)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
-$(BIN4)/bank_sim: 1_4_bank_simulation/thread_bank_sim.c | $(BIN4)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_4)/bank_sim: 1_4_bank_simulation/thread_bank_sim.c | $(BIN_1_4)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
 # 1.5 Barrier implementations
-$(BIN5)/barrier_pthread: 1_5_barrier_implementations/pthread_barrier_impl.c | $(BIN5)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_5)/barrier_pthread: 1_5_barrier_implementations/pthread_barrier_impl.c | $(BIN_1_5)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
 
-$(BIN5)/barrier_cond: 1_5_barrier_implementations/cond_barrier_impl.c | $(BIN5)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_5)/barrier_cond: 1_5_barrier_implementations/cond_barrier_impl.c | $(BIN_1_5)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
 
-$(BIN5)/barrier_sense: 1_5_barrier_implementations/sense_reversal_barrier_impl.c | $(BIN5)
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+$(BIN_1_5)/barrier_sense: 1_5_barrier_implementations/sense_reversal_barrier_impl.c | $(BIN_1_5)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS) 
+
+# 2.2 Sparse array-vector multiplication
+$(BIN_2_2)/sparse_arr_vector_mult: 2_2_sparse_array_vector_multiplication/sparse_arr_vector_mult.c | $(BIN_2_2)
+	$(CC) $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS) 
+
+# 2.1 Polynomial multiplication (OpenMP)
+$(BIN_2_1)/seq_poly_mult: 2_1_polynomial_multiplication/sequential_polynomial_multiplication.c | $(BIN_2_1)
+	$(CC) $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS)  
+
+$(BIN_2_1)/poly_mult: 2_1_polynomial_multiplication/thread_polynomial_multiplication.c | $(BIN_2_1)
+	$(CC) $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS)  
+
+# 2.3 Mergesort
+$(BIN_2_3)/mergesort: 2_3_mergesort/mergesort.c | $(BIN_2_3)
+	$(CC) $(CFLAGS_COMMON) -o $@ $< $(LDFLAGS)  
+
+# 3.2 MPI Sparse array-vector multiplication
+$(BIN_3_2)/sparse_arr_vector_mult: 3_2_sparse_array_vector_nultiplication/sparse_arr_vector_mult.c | $(BIN_3_2)
+	$(MPICC) $(CFLAGS_MPI) -o $@ $< $(LDFLAGS) 
+
+# 3.1 Polynomial multiplication (MPI)
+$(BIN_3_1)/seq_poly_mult: 3_1_polynomial_multiplication/sequential_polynomial_multiplication.c | $(BIN_3_1)
+	$(MPICC) $(CFLAGS_MPI) -o $@ $< $(LDFLAGS) 
+
+$(BIN_3_1)/thread_poly_mult: 3_1_polynomial_multiplication/thread_polynomial_multiplication.c | $(BIN_3_1)
+	$(MPICC) $(CFLAGS_MPI) -o $@ $< $(LDFLAGS) 
+
+# 3.3 Hybrid sparse (MPI) - same dir as exercise
+$(BIN_3_3)/sparse_arr_vector_mult: 3_3_is_2_2_and_3_2_hybrid/sparse_arr_vector_mult.c | $(BIN_3_3)
+	$(MPICC) $(CFLAGS_MPI) -o $@ $< $(LDFLAGS) 
 
 clean:
-	rm -rf $(BIN1)/* $(BIN2)/* $(BIN3)/* $(BIN4)/* $(BIN5)/*
+	rm -rf $(BIN_1_1)/* $(BIN_1_2)/* $(BIN_1_3)/* $(BIN_1_4)/* $(BIN_1_5)/* $(BIN_2_2)/* $(BIN_3_2)/* $(BIN_2_1)/* $(BIN_2_3)/* $(BIN_3_1)/* $(BIN_3_3)/*
 
 .PHONY: all clean
