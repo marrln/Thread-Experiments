@@ -31,9 +31,9 @@ for n in "${NS[@]}"; do
                     # sequential baseline (label as 'sequential') when procs = 1
             echo -n "Running (sequential) n=$n sparsity=$s reps=$reps ... "
             if command -v mpirun >/dev/null 2>&1; then
-                raw=$(mpirun -np 1 "$BIN" $n $s $reps)
+                raw=$(mpirun --oversubscribe -np 1 "$BIN" $n $s $reps)
             else
-                raw=$(mpiexec -n 1 "$BIN" $n $s $reps)
+                raw=$(mpiexec --oversubscribe -n 1 "$BIN" $n $s $reps)
             fi
             echo "$raw"
             # reorder raw: n,sparsity,reps,procs,nnz,... -> n,procs,sparsity,reps,nnz,... with procs = 'sequential'
@@ -44,9 +44,9 @@ for n in "${NS[@]}"; do
                 if [ "$p" -eq 1 ]; then continue; fi
                 echo -n "Running n=$n sparsity=$s reps=$reps procs=$p ... "
                 if command -v mpirun >/dev/null 2>&1; then
-                    raw=$(mpirun -np $p "$BIN" $n $s $reps)
+                    raw=$(mpirun --oversubscribe -np $p "$BIN" $n $s $reps)
                 else
-                    raw=$(mpiexec -n $p "$BIN" $n $s $reps)
+                    raw=$(mpiexec --oversubscribe -n $p "$BIN" $n $s $reps)
                 fi
                 echo "$raw"
                 # reorder raw to put procs second: n,sparsity,reps,procs,nnz,... -> n,procs,sparsity,reps,nnz,...
