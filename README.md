@@ -44,8 +44,9 @@ You can also run all experiments for each parallel model using the corresponding
 
 Notes:
 - On Windows, run the shell scripts from WSL, Git Bash, or another POSIX-like environment.
-- The individual experiment scripts compile and append results to CSV files in each experiment
-    folder (look for `results_*.csv`).
+- The top-level run scripts (e.g. `run_experiments_1.sh`, `run_experiments_2.sh`, `run_experiments_3.sh`) compile the binaries (individual experiment run scripts assume the binaries already exist) and append results to CSV files in each experiment folder (look for `results_*.csv`).
+
+- For MPI experiments run locally on a single machine we allow Open MPI oversubscription by default (the run scripts use `mpirun --oversubscribe` / `mpiexec --oversubscribe`) so you can run experiments with more processes than physical cores for scalability testing.
 
 ## Tagging runs with a user name (why this matters)
 The experiment runner and plotting tools include a `user` field in the generated CSVs. The
