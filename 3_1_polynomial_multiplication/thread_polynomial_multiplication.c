@@ -103,7 +103,35 @@ int main(int argc, char *argv[]) {
 
 	// Print timings
 	if (rank == 0) {
-		printf("%f,%f,%f,%f\n", t_send, t_compute, t_recv, t_total);
+		/* Compute verification by comparing gathered C with sequential result */
+		int verification_passed = 1;
+		int *C_expected = calloc(result_size, sizeof(int));
+		for (int k = 0; k < result_size; k++) {
+			int i_start = (k < n) ? 0 : k - n;
+			int i_end = (k < n) ? k : n;
+			int sum = 0;
+			for (int i = i_start; i <= i_end; i++) {
+				sum += A[i] * B[k - i];
+			}
+			C_expected[k] = sum;
+			if (C[k] != C_expected[k]) verification_passed = 0;
+		}
+		free(C_expected);
+
+		/* Map measured times */
+		double time_alloc = 0.0;
+		double time_init = 0.0;
+		double time_create = t_send; 
+		double time_compute = t_compute;
+		double time_join = t_recv; /* use this slot for gather/recv time */
+		double time_reduce = 0.0;
+		double time_verify = 0.0; /* verification cost not timed separately */
+		double time_cleanup = 0.0;
+		double time_total = t_total;
+
+		printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
+			time_alloc, time_init, time_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+			verification_passed ? "PASS" : "FAIL");
 	}
 
 	// Cleanup
