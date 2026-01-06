@@ -94,8 +94,6 @@ int main(int argc, char *argv[]) {
 
     double time_alloc = time_alloc_end - time_start;
     double time_init = time_init_end - time_alloc_end;
-    /* thread create not separately timed in this implementation */
-    double time_thread_create = time_thread_create;
     double time_join = 0.0;
     double time_reduce = 0.0;
     double time_verify = time_verify_end - time_verify_start;
