@@ -4,9 +4,6 @@
 #include <mpi.h>
 #include <sys/time.h>
 
-static double now_mpi() {
-    return MPI_Wtime();
-}
 
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
@@ -58,7 +55,7 @@ int main(int argc, char *argv[]) {
     int *row_ptr = NULL; int *col_idx = NULL; int *values = NULL; long long nnz = 0;
     double t_csr_construct = 0.0;
     if (rank == 0) {
-        double t0 = now_mpi();
+        double t0 = MPI_Wtime();
         int *row_nnz = malloc(sizeof(int) * n);
         for (int i = 0; i < n; ++i) {
             int cnt = 0;
@@ -85,7 +82,7 @@ int main(int argc, char *argv[]) {
             }
         }
         free(row_nnz);
-        t_csr_construct = now_mpi() - t0;
+        t_csr_construct = MPI_Wtime() - t0;
     }
 
     // Determine rows per process
@@ -108,7 +105,7 @@ int main(int argc, char *argv[]) {
     double t_send = 0.0;
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0) {
-        double ts = now_mpi();
+        double ts = MPI_Wtime();
         for (int p = 1; p < size; ++p) {
             int rs = row_starts[p];
             int rn = rows_per_proc[p];
@@ -137,7 +134,7 @@ int main(int argc, char *argv[]) {
             memcpy(local_col_idx, &col_idx[row_ptr[local_row_start]], sizeof(int) * local_nnz);
             memcpy(local_values, &values[row_ptr[local_row_start]], sizeof(int) * local_nnz);
         }
-        t_send = now_mpi() - ts;
+        t_send = MPI_Wtime() - ts;
     } else {
         // receive counts
         MPI_Recv(&local_nrows, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -176,7 +173,7 @@ int main(int argc, char *argv[]) {
 
     // Timed repeated CSR multiplies (include broadcast and gather in timing)
     MPI_Barrier(MPI_COMM_WORLD);
-    double t_spmv_start = now_mpi();
+    double t_spmv_start = MPI_Wtime();
     int *y_gather = NULL;
     int *recvcounts = NULL; int *displs = NULL;
     if (rank == 0) {
@@ -203,7 +200,7 @@ int main(int argc, char *argv[]) {
         if (rank == 0) memcpy(x, y_gather, sizeof(int) * n);
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    double t_spmv_end = now_mpi();
+    double t_spmv_end = MPI_Wtime();
     double t_spmv = t_spmv_end - t_spmv_start;
 
     double t_csr_total = t_csr_construct + t_send + t_spmv;
@@ -229,7 +226,7 @@ int main(int argc, char *argv[]) {
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-    double t_dense_start = now_mpi();
+    double t_dense_start = MPI_Wtime();
     // scatter dense rows
     MPI_Scatterv(dense, sendcounts_dense, displs_dense, MPI_INT, local_dense, local_nrows * n, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -255,7 +252,7 @@ int main(int argc, char *argv[]) {
         MPI_Bcast((rank == 0 ? x : x_local), n, MPI_INT, 0, MPI_COMM_WORLD);
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    double t_dense_end = now_mpi();
+    double t_dense_end = MPI_Wtime();
     t_dense = t_dense_end - t_dense_start;
 
     // On root, verify and print
