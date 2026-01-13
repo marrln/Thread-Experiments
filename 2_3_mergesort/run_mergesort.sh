@@ -20,7 +20,7 @@ if [ ! -x "$BIN" ]; then
 fi
 
 NS=(10000 50000 100000)
-THREADS=(1 2 4 8)
+THREADS=(sequential 1 2 4 8)
 
 for n in "${NS[@]}"; do
     for th in "${THREADS[@]}"; do
