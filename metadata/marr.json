@@ -1,0 +1,12 @@
+{
+	"user": "marr",
+	"collected_at": "2026-01-08T19:55:57Z",
+	"host": "LAPTOP-I9RLGS2S",
+	"os": "Ubuntu 24.04.3 LTS",
+	"cpu_model": "AMD Ryzen 5 4500U with Radeon Graphics",
+	"n_logical_cpus": 4,
+	"mem_kb": 7478512,
+	"compiler": "gcc",
+	"compiler_flags": "-Wall -O2 -fopenmp",
+	"git_commit": "b07334b"
+}
