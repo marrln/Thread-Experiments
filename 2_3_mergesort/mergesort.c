@@ -43,10 +43,11 @@ int cmp_int(const void *a, const void *b) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) { fprintf(stderr, "Usage: %s <n> <threads>\n", argv[0]); return 1; }
+    if (argc != 3) { fprintf(stderr, "Usage: %s <n> <threads|sequential>\n", argv[0]); return 1; }
     int n = atoi(argv[1]);
-    int threads = atoi(argv[2]);
-    if (n <= 0 || threads <= 0) { fprintf(stderr, "Invalid args\n"); return 1; }
+    int is_sequential = (strcmp(argv[2], "sequential") == 0);
+    int threads = is_sequential ? 0 : atoi(argv[2]);
+    if (n <= 0 || (!is_sequential && threads <= 0)) { fprintf(stderr, "Invalid args\n"); return 1; }
 
     double time_start = now_sec();
     int *a = malloc(n * sizeof(int));
@@ -59,27 +60,34 @@ int main(int argc, char *argv[]) {
     memcpy(b, a, n * sizeof(int));
     double time_init_end = now_sec();
 
-    omp_set_num_threads(threads);
     double time_thread_create = 0.0;
     double time_compute = 0.0;
     double compute_start = 0.0, compute_end = 0.0;
 
-    if (threads == 1) {
+    if (is_sequential) {
         compute_start = now_sec();
         seq_mergesort_rec(a, tmp, 0, n);
         compute_end = now_sec();
         time_compute = compute_end - compute_start;
     } else {
-        compute_start = now_sec();
-        #pragma omp parallel
-        {
-            #pragma omp single nowait
+        omp_set_num_threads(threads);
+        if (threads == 1) {
+            compute_start = now_sec();
+            seq_mergesort_rec(a, tmp, 0, n);
+            compute_end = now_sec();
+            time_compute = compute_end - compute_start;
+        } else {
+            compute_start = now_sec();
+            #pragma omp parallel
             {
-                parallel_mergesort_rec(a, tmp, 0, n, 0);
+                #pragma omp single nowait
+                {
+                    parallel_mergesort_rec(a, tmp, 0, n, 0);
+                }
             }
+            compute_end = now_sec();
+            time_compute = compute_end - compute_start;
         }
-        compute_end = now_sec();
-        time_compute = compute_end - compute_start;
     }
 
     double time_verify_start = now_sec();
@@ -100,9 +108,15 @@ int main(int argc, char *argv[]) {
     double time_cleanup = time_end - time_cleanup_start;
     double time_total = time_end - time_start;
 
-    printf("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
-        n, threads, time_alloc, time_init, time_thread_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
-        ok ? "PASS" : "FAIL");
+    if (is_sequential) {
+        printf("%d,sequential,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
+            n, time_alloc, time_init, time_thread_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+            ok ? "PASS" : "FAIL");
+    } else {
+        printf("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
+            n, threads, time_alloc, time_init, time_thread_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+            ok ? "PASS" : "FAIL");
+    }
 
     return 0;
 }
