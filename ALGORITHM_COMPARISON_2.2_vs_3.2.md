@@ -54,12 +54,13 @@ for (int i = 0; i < n; ++i)
 
 ---
 
-### 3. CSR Construction ✅ IDENTICAL ALGORITHM
+### 3. CSR Construction ✅ IDENTICAL ALGORITHM (Updated to match structure)
 
-Both use the same 3-step process:
+Both use **exactly the same 4-step process** with identical variable names and structure:
 
 #### Step 1: Count non-zeros per row
 ```c
+int *row_nnz = malloc(sizeof(int) * n);
 for (int i = 0; i < n; ++i) {
     int count = 0;
     for (int j = 0; j < n; ++j) 
@@ -70,31 +71,41 @@ for (int i = 0; i < n; ++i) {
 
 #### Step 2: Compute row_ptr via prefix sum
 ```c
+row_ptr = malloc(sizeof(int) * (n + 1));
 row_ptr[0] = 0;
-for (int i = 0; i < n; ++i) 
-    row_ptr[i+1] = row_ptr[i] + row_nnz[i];
+for (int i = 0; i < n; ++i) {
+    nnz += row_nnz[i];
+    row_ptr[i+1] = (int)nnz;
+}
 ```
 
-#### Step 3: Fill CSR arrays
+#### Step 3: Allocate CSR arrays
+```c
+col_idx = malloc(sizeof(int) * nnz);
+values = malloc(sizeof(int) * nnz);
+```
+
+#### Step 4: Fill CSR arrays
 ```c
 for (int i = 0; i < n; ++i) {
-    int base = row_ptr[i];
     int offset = 0;
+    int base = row_ptr[i];
     for (int j = 0; j < n; ++j) {
         int v = dense[(long long)i * n + j];
         if (v != 0) {
-            values[base + offset] = v;
-            col_idx[base + offset] = j;
+            int idx = base + offset;
+            values[idx] = v;
+            col_idx[idx] = j;
             offset++;
         }
     }
 }
 ```
 
-**2.2 Difference:** Steps 1 and 3 use `#pragma omp parallel for`  
-**3.2 Difference:** All steps sequential on rank 0, then CSR distributed
+**2.2 Difference:** Steps 1 and 4 use `#pragma omp parallel for schedule(static)` for parallel execution  
+**3.2 Difference:** All steps are sequential on rank 0 (pure MPI, no OpenMP)
 
-**Result:** Same CSR representation (values, col_idx, row_ptr).
+**Result:** Identical CSR representation (values, col_idx, row_ptr) with same variable names and code structure.
 
 ---
 

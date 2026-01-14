@@ -51,33 +51,43 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < n; ++i) x[i] = (rand_r(&seed_x) % 9) + 1;
     }
 
-    // Build CSR on root
+    // Build CSR representation on root (same algorithm as 2.2, but sequential)
     int *row_ptr = NULL; int *col_idx = NULL; int *values = NULL; long long nnz = 0;
     double t_csr_construct = 0.0;
     if (rank == 0) {
         double t0 = MPI_Wtime();
+        
+        // Step 1: Count non-zeros per row
         int *row_nnz = malloc(sizeof(int) * n);
         for (int i = 0; i < n; ++i) {
-            int cnt = 0;
-            for (int j = 0; j < n; ++j) if (dense[(long long)i * n + j] != 0) cnt++;
-            row_nnz[i] = cnt;
-            nnz += cnt;
+            int count = 0;
+            for (int j = 0; j < n; ++j) if (dense[(long long)i * n + j] != 0) count++;
+            row_nnz[i] = count;
         }
+
+        // Step 2: Compute row_ptr via sequential prefix sum (cumulative offsets)
         row_ptr = malloc(sizeof(int) * (n + 1));
         row_ptr[0] = 0;
-        for (int i = 0; i < n; ++i) row_ptr[i+1] = row_ptr[i] + row_nnz[i];
+        for (int i = 0; i < n; ++i) {
+            nnz += row_nnz[i];
+            row_ptr[i+1] = (int)nnz;
+        }
+
+        // Step 3: Allocate CSR arrays (values and col_idx) based on total nnz
         col_idx = malloc(sizeof(int) * nnz);
         values = malloc(sizeof(int) * nnz);
+
+        // Step 4: Fill CSR arrays (each row fills its segment independently)
         for (int i = 0; i < n; ++i) {
+            int offset = 0;
             int base = row_ptr[i];
-            int off = 0;
             for (int j = 0; j < n; ++j) {
                 int v = dense[(long long)i * n + j];
                 if (v != 0) {
-                    int idx = base + off;
+                    int idx = base + offset;
                     values[idx] = v;
                     col_idx[idx] = j;
-                    off++;
+                    offset++;
                 }
             }
         }
