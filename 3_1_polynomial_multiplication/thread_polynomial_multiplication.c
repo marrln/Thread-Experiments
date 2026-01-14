@@ -124,13 +124,11 @@ int main(int argc, char *argv[]) {
 		double time_create = t_send; 
 		double time_compute = t_compute;
 		double time_join = t_recv; /* use this slot for gather/recv time */
-		double time_reduce = 0.0;
-		double time_verify = 0.0; /* verification cost not timed separately */
 		double time_cleanup = 0.0;
 		double time_total = t_total;
 
-		printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
-			time_alloc, time_init, time_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+		printf("%f,%f,%f,%f,%f,%f,%f,%s\n",
+			time_alloc, time_init, time_create, time_compute, time_join, time_cleanup, time_total,
 			verification_passed ? "PASS" : "FAIL");
 	}
 
