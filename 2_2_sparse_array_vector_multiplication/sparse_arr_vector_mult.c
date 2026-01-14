@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
     omp_set_num_threads(num_threads);
 
     const unsigned int base_seed = 42u;
-    double t_start = now_sec();
 
     // Allocate dense matrix (row-major) and vectors
     long long matrix_size = (long long)n * (long long)n;
@@ -68,7 +67,8 @@ int main(int argc, char *argv[]) {
 
     double t_init_end = now_sec();
 
-    // Build CSR: count nonzeros per row (parallel)
+    // Build CSR representation:
+    // Step 1: Count non-zeros per row in parallel
     int *row_nnz = malloc(sizeof(int) * n);
     if (!row_nnz) { free(dense); free(x); free(y); return 1; }
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         row_nnz[i] = count;
     }
 
-    // prefix sum to get row_ptr
+    // Step 2: Compute row_ptr via sequential prefix sum (cumulative offsets)
     long long nnz = 0;
     int *row_ptr = malloc(sizeof(int) * (n + 1));
     if (!row_ptr) { free(dense); free(x); free(y); free(row_nnz); return 1; }
@@ -91,12 +91,12 @@ int main(int argc, char *argv[]) {
         row_ptr[i+1] = (int)nnz;
     }
 
-    // allocate CSR arrays
+    // Step 3: Allocate CSR arrays (values and col_idx) based on total nnz
     int *col_idx = malloc(sizeof(int) * nnz);
     int *values = malloc(sizeof(int) * nnz);
     if ((nnz > 0 && (!col_idx || !values)) ) { fprintf(stderr, "Allocation failed for CSR arrays\n"); free(dense); free(x); free(y); free(row_nnz); free(row_ptr); return 1; }
 
-    // fill CSR arrays in parallel per row
+    // Step 4: Fill CSR arrays in parallel (each row fills its segment independently)
     #pragma omp parallel for schedule(static)
     for (int i = 0; i < n; ++i) {
         int offset = 0;
