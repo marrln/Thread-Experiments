@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
         t_csr_construct = MPI_Wtime() - t0;
     }
 
-    // Determine rows per process
+    // Determine rows per process (distribute n rows as evenly as possible)
+    // First rem processes get one extra row to handle remainder
     int *rows_per_proc = malloc(sizeof(int) * size);
     int *row_starts = malloc(sizeof(int) * size);
     int base = n / size; int rem = n % size;
@@ -102,6 +103,7 @@ int main(int argc, char *argv[]) {
     int *local_row_ptr = NULL; int *local_col_idx = NULL; int *local_values = NULL;
 
     // Send CSR pieces from root to other processes (and keep local copy on root)
+    // Each process gets: row_count, nnz_count, adjusted row_ptr, col_idx, values
     double t_send = 0.0;
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank == 0) {
