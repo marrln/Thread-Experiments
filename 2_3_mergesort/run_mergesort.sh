@@ -9,7 +9,7 @@ fi
 
 CSV_FILE="results_2.3.csv"
 if [ ! -f "$CSV_FILE" ]; then
-    echo "n,threads,time_alloc,time_init,time_thread_create,time_compute,time_join,time_reduce,time_verify,time_cleanup,time_total,verification,user" > "$CSV_FILE"
+    echo "n,threads,time_alloc,time_init,time_compute,time_verify,time_cleanup,time_total,verification,user" > "$CSV_FILE"
 fi
 
 SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"

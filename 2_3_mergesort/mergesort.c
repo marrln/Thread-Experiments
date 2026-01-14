@@ -60,7 +60,6 @@ int main(int argc, char *argv[]) {
     memcpy(b, a, n * sizeof(int));
     double time_init_end = now_sec();
 
-    double time_thread_create = 0.0;
     double time_compute = 0.0;
     double compute_start = 0.0, compute_end = 0.0;
 
@@ -102,19 +101,17 @@ int main(int argc, char *argv[]) {
 
     double time_alloc = time_alloc_end - time_start;
     double time_init = time_init_end - time_alloc_end;
-    double time_join = 0.0;
-    double time_reduce = 0.0;
     double time_verify = time_verify_end - time_verify_start;
     double time_cleanup = time_end - time_cleanup_start;
     double time_total = time_end - time_start;
 
     if (is_sequential) {
-        printf("%d,sequential,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
-            n, time_alloc, time_init, time_thread_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+        printf("%d,sequential,%f,%f,%f,%f,%f,%f,%s\n",
+            n, time_alloc, time_init, time_compute, time_verify, time_cleanup, time_total,
             ok ? "PASS" : "FAIL");
     } else {
-        printf("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s\n",
-            n, threads, time_alloc, time_init, time_thread_create, time_compute, time_join, time_reduce, time_verify, time_cleanup, time_total,
+        printf("%d,%d,%f,%f,%f,%f,%f,%f,%s\n",
+            n, threads, time_alloc, time_init, time_compute, time_verify, time_cleanup, time_total,
             ok ? "PASS" : "FAIL");
     }
 
