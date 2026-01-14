@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
     omp_set_num_threads(num_threads);
 
     const unsigned int base_seed = 42u;
-    double t_start = now_sec();
 
     // Allocate dense matrix (row-major) and vectors
     long long matrix_size = (long long)n * (long long)n;
