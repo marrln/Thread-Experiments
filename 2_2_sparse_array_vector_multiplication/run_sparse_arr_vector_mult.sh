@@ -20,7 +20,7 @@ if [ ! -x "$BIN" ]; then
 fi
 
 # Experiment parameters
-NS=(1000 2000 4000)
+NS=(1000 4000 6000 10000)
 SPARS=(0 50 90 95 99)
 REPS=(1 5 10)
 THREADS=(1 2 4 8)

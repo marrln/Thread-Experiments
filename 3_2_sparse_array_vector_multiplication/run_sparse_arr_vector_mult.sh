@@ -19,16 +19,16 @@ if [ ! -x "$BIN" ]; then
     exit 1
 fi
 
-# Experiment parameters (customize as needed)
-NS=(1000 2000)
-SPARS=(0 90 99)
-REPS=(1 5)
-PROCS=(1 2 4)
+# Experiment parameters
+NS=(1000 4000 6000 10000)
+SPARS=(0 50 90 95 99)
+REPS=(1 5 10)
+PROCS=(1 2 4 8)
 
 for n in "${NS[@]}"; do
     for s in "${SPARS[@]}"; do
         for reps in "${REPS[@]}"; do
-                    # sequential baseline (label as 'sequential') when procs = 1
+            # sequential baseline (label as 'sequential') when procs = 1
             echo -n "Running (sequential) n=$n sparsity=$s reps=$reps ... "
             if command -v mpirun >/dev/null 2>&1; then
                 raw=$(mpirun --oversubscribe -np 1 "$BIN" $n $s $reps)
