@@ -1,12 +1,12 @@
 {
 	"user": "marr",
-	"collected_at": "2026-01-08T19:55:57Z",
-	"host": "LAPTOP-I9RLGS2S",
+	"collected_at": "2026-01-14T20:32:25Z",
+	"host": "marr-linux",
 	"os": "Ubuntu 24.04.3 LTS",
-	"cpu_model": "AMD Ryzen 5 4500U with Radeon Graphics",
-	"n_logical_cpus": 4,
-	"mem_kb": 7478512,
+	"cpu_model": "12th Gen Intel(R) Core(TM) i5-12600KF",
+	"n_logical_cpus": 8,
+	"mem_kb": 17567116,
 	"compiler": "gcc",
 	"compiler_flags": "-Wall -O2 -fopenmp",
-	"git_commit": "b07334b"
+	"git_commit": "3561563"
 }
