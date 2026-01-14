@@ -205,22 +205,27 @@ All experiments compile successfully, execute correctly, and produce verified re
 
 ---
 
-## Issues Found
+## Issues Found and Resolutions
 
 ### Critical Issues
 **None** ❌
 
-### Minor Issues
+### Minor Issues - ALL RESOLVED ✅
 
-1. **2_2_sparse_array_vector_multiplication/sparse_arr_vector_mult.c:32**
-   - Unused variable: `t_start`
+1. **2_2_sparse_array_vector_multiplication/sparse_arr_vector_mult.c:32** ✅ **FIXED**
+   - Issue: Unused variable `t_start`
    - Impact: Compiler warning only, no functional impact
-   - Recommendation: Remove unused variable
+   - Resolution: Removed unused variable (commit: cc249ba)
+   - Status: ✅ Verified - code compiles without warnings
 
-2. **Code Comments**
-   - Some complex algorithms could benefit from additional inline comments
+2. **Code Comments** ✅ **ENHANCED**
+   - Issue: Some complex algorithms could benefit from additional inline comments
    - Impact: None on functionality, affects maintainability
-   - Recommendation: Add brief comments for CSR construction and distribution logic
+   - Resolution: Added clarifying comments for:
+     - CSR 4-step construction process in experiment 2.2
+     - Row distribution strategy in experiment 3.2
+     - CSR data distribution in experiment 3.2
+   - Status: ✅ Code maintainability improved (commit: 67f2ab5)
 
 ---
 
@@ -277,10 +282,24 @@ The implementations for experiments 2_* (OpenMP) and 3_* (MPI) **meet all projec
 3. Deterministic random number generation for reproducible results
 4. Good workload distribution strategies
 5. Proper timing granularity for performance analysis
+6. **✅ Experiments 2.2 and 3.2 use identical algorithms** - suitable for fair efficiency comparison
+
+### Cross-Experiment Consistency (2.2 vs 3.2):
+The sparse matrix-vector multiplication experiments use **identical computational algorithms**:
+- ✅ Same matrix initialization (seed=42, sparsity logic)
+- ✅ Same vector initialization (seed=base_seed+12345)
+- ✅ Same CSR construction algorithm (3-array format)
+- ✅ Same SpMV computation kernel
+- ✅ Same dense multiplication kernel
+- ✅ Same iteration pattern (output → next input)
+
+**Only difference:** Parallelization model (OpenMP shared-memory vs MPI distributed-memory)
+
+This ensures **fair performance comparison** between the two parallel programming models as required by the assignments.
 
 ### Areas for Minor Improvement:
-1. Clean up compiler warning (unused variable)
-2. Enhanced code documentation for complex sections
+1. ~~Clean up compiler warning (unused variable)~~ ✅ FIXED
+2. ~~Enhanced code documentation for complex sections~~ ✅ FIXED
 
 ---
 
