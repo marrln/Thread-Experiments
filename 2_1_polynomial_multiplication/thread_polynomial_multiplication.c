@@ -86,8 +86,8 @@ int main(int argc, char *argv[]) {
 	double time_total = (t_end.tv_sec - t_start.tv_sec) + (t_end.tv_usec - t_start.tv_usec) / 1000000.0;
 
 	// Print times in CSV
-	// time_alloc,time_init,time_thread_create,time_compute,time_join,time_reduce,time_verify,time_cleanup,time_total,verification
-	printf("%f,%f,0.0,%f,0.0,0.0,%f,%f,%f,%s\n",
+	// time_alloc,time_init,time_compute,time_verify,time_cleanup,time_total,verification
+	printf("%f,%f,%f,%f,%f,%f,%s\n",
 		time_alloc, time_init, time_parallel, time_verify, time_cleanup, time_total,
 		verification_passed ? "PASS" : "FAIL");
 
