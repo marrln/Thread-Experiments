@@ -1,12 +1,12 @@
 {
 	"user": "phoebus",
-	"collected_at": "2026-01-06T10:36:46Z",
+	"collected_at": "2026-01-14T22:55:57Z",
 	"host": "phoebus-VirtualBox",
 	"os": "Ubuntu 25.04",
 	"cpu_model": "Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz",
 	"n_logical_cpus": 6,
-	"mem_kb": 10626188,
+	"mem_kb": 10626184,
 	"compiler": "gcc",
 	"compiler_flags": "-Wall -O2 -fopenmp",
-	"git_commit": "02d702d"
+	"git_commit": "66ef9bd"
 }
