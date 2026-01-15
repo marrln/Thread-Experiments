@@ -10,7 +10,7 @@ fi
 # Create CSV file with header if it does not exist (append otherwise)
 CSV_FILE="results_3.1.csv"
 if [ ! -f "$CSV_FILE" ]; then
-    echo "degree,threads,time_alloc,time_init,time_thread_create,time_compute,time_join,time_verify,time_cleanup,time_total,verification,user" > "$CSV_FILE"
+    echo "degree,threads,time_alloc,time_init,time_create,time_compute,time_join,time_cleanup,time_total,verification,user" > "$CSV_FILE"
 fi
 
 SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
