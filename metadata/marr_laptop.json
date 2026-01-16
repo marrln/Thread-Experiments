@@ -1,12 +1,12 @@
 {
 	"user": "marr",
-	"collected_at": "2025-12-04T11:09:30Z",
+	"collected_at": "2026-01-14T20:32:25Z",
 	"host": "marr-linux",
 	"os": "Ubuntu 24.04.3 LTS",
 	"cpu_model": "12th Gen Intel(R) Core(TM) i5-12600KF",
 	"n_logical_cpus": 8,
-	"mem_kb": 16376204,
+	"mem_kb": 17567116,
 	"compiler": "gcc",
-	"compiler_flags": "-Wall -O2 -pthread",
-	"git_commit": "b3cb35e"
+	"compiler_flags": "-Wall -O2 -fopenmp",
+	"git_commit": "3561563"
 }
