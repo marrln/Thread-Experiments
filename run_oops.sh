@@ -11,6 +11,10 @@ if [ -z "$RUN_USER" ]; then
 fi
 export RUN_USER
 
+# Create bin directories if they don't exist
+mkdir -p 2_2_sparse_array_vector_multiplication/bin
+mkdir -p 3_2_sparse_array_vector_multiplication/bin
+
 # Compile sequential binaries
 echo "Compiling sequential binaries..."
 gcc -Wall -O2 -pthread -o 2_2_sparse_array_vector_multiplication/bin/seq_sparse_arr_vector_mult \
