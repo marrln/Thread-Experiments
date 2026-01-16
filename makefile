@@ -28,7 +28,7 @@ all:	$(BIN_1_1) $(BIN_1_2) $(BIN_1_3) $(BIN_1_4) $(BIN_1_5) \
 		$(BIN_1_2)/shared_var \
 		$(BIN_1_3)/seq_arr_analysis $(BIN_1_3)/thread_arr_analysis_unpadded $(BIN_1_3)/thread_arr_analysis_padded $(BIN_1_3)/thread_arr_analysis_local_accum \
 		$(BIN_1_4)/seq_bank_sim $(BIN_1_4)/bank_sim \
-		$(BIN_1_5)/barrier_pthread $(BIN_1_5)/barrier_cond $(BIN_1_5)/barrier_sense $(BIN_2_2)/sparse_arr_vector_mult $(BIN_3_2)/sparse_arr_vector_mult \
+		$(BIN_1_5)/barrier_pthread $(BIN_1_5)/barrier_cond $(BIN_1_5)/barrier_sense $(BIN_2_2)/sparse_arr_vector_mult $(BIN_2_2)/seq_sparse_arr_vector_mult $(BIN_3_2)/sparse_arr_vector_mult $(BIN_3_2)/seq_sparse_arr_vector_mult \
 		$(BIN_2_1)/seq_poly_mult $(BIN_2_1)/poly_mult $(BIN_2_3)/mergesort \
 		$(BIN_3_1)/seq_poly_mult $(BIN_3_1)/thread_poly_mult 
 
@@ -78,7 +78,9 @@ $(BIN_2_1)/seq_poly_mult: 2_1_polynomial_multiplication/sequential_polynomial_mu
 	
 # 2.2 Sparse array-vector multiplication (OpenMP)
 $(BIN_2_2)/sparse_arr_vector_mult: 2_2_sparse_array_vector_multiplication/sparse_arr_vector_mult.c | $(BIN_2_2)
-	gcc $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS) 
+	gcc $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS)
+$(BIN_2_2)/seq_sparse_arr_vector_mult: 2_2_sparse_array_vector_multiplication/sequential_sparse_arr_vector_mult.c | $(BIN_2_2)
+	gcc $(CFLAGS) -o $@ $< $(LDFLAGS)
 $(BIN_2_1)/poly_mult: 2_1_polynomial_multiplication/thread_polynomial_multiplication.c | $(BIN_2_1)
 	gcc $(CFLAGS_OPENMP) -o $@ $< $(LDFLAGS)  
 
@@ -94,7 +96,9 @@ $(BIN_3_1)/thread_poly_mult: 3_1_polynomial_multiplication/thread_polynomial_mul
 
 # 3.2 Sparse array-vector multiplication (MPI)
 $(BIN_3_2)/sparse_arr_vector_mult: 3_2_sparse_array_vector_multiplication/sparse_arr_vector_mult.c | $(BIN_3_2)
-	mpicc $(CFLAGS_MPI) -o $@ $< $(LDFLAGS) 
+	mpicc $(CFLAGS_MPI) -o $@ $< $(LDFLAGS)
+$(BIN_3_2)/seq_sparse_arr_vector_mult: 3_2_sparse_array_vector_multiplication/sequential_sparse_arr_vector_mult.c | $(BIN_3_2)
+	gcc $(CFLAGS) -o $@ $< $(LDFLAGS) 
 
 clean:
 	rm -rf $(BIN_1_1)/* $(BIN_1_2)/* $(BIN_1_3)/* $(BIN_1_4)/* $(BIN_1_5)/* $(BIN_2_1)/* $(BIN_2_2)/* $(BIN_2_3)/* $(BIN_3_1)/*  $(BIN_3_2)/*

@@ -14,8 +14,13 @@ fi
 
 SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 BIN="$SCRIPTDIR/bin/sparse_arr_vector_mult"
+SEQ_BIN="$SCRIPTDIR/bin/sequential_sparse_arr_vector_mult"
 if [ ! -x "$BIN" ]; then
     echo "Binary $BIN not found. Please run the top-level script (run_experiments_3.sh) to compile all binaries.";
+    exit 1
+fi
+if [ ! -x "$SEQ_BIN" ]; then
+    echo "Binary $SEQ_BIN not found. Please run the top-level script (run_experiments_3.sh) to compile all binaries.";
     exit 1
 fi
 
@@ -28,16 +33,14 @@ PROCS=(1 2 4 8)
 for n in "${NS[@]}"; do
     for s in "${SPARS[@]}"; do
         for reps in "${REPS[@]}"; do
-            # sequential baseline (label as 'sequential') when procs = 1
+            # sequential baseline (true sequential without MPI)
             echo -n "Running (sequential) n=$n sparsity=$s reps=$reps ... "
-            if command -v mpirun >/dev/null 2>&1; then
-                raw=$(mpirun --oversubscribe -np 1 "$BIN" $n $s $reps)
-            else
-                raw=$(mpiexec --oversubscribe -n 1 "$BIN" $n $s $reps)
-            fi
+            raw=$($SEQ_BIN $n $s $reps)
             echo "$raw"
-            # reorder raw: n,sparsity,reps,procs,nnz,... -> n,procs,sparsity,reps,nnz,... with procs = 'sequential'
-            line=$(echo "$raw" | awk -F',' '{printf "%s,%s,%s,%s", $1, "sequential", $2, $3; for(i=5;i<=NF;i++) printf ",%s", $i; printf "\n" }')
+            # seq output: n,sparsity,reps,nnz,time_csr_construct,time_spmv_total,time_dense_total,time_total,verification
+            # target: n,procs,sparsity,reps,nnz,time_csr_construct,time_send,time_spmv,time_csr_total,time_dense_total,verification,user
+            # set time_send=0 for sequential
+            line=$(echo "$raw" | awk -F',' '{printf "%s,%s,%s,%s,%s,%s,0.0,%s,%s,%s,%s", $1, "sequential", $2, $3, $4, $5, $6, $8, $7, $9; printf "\n" }')
             echo "$line,$RUN_USER" >> "$CSV_FILE"
 
             for p in "${PROCS[@]}"; do

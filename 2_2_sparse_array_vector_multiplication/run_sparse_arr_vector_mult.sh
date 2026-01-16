@@ -14,8 +14,13 @@ fi
 
 SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 BIN="$SCRIPTDIR/bin/sparse_arr_vector_mult"
+SEQ_BIN="$SCRIPTDIR/bin/sequential_sparse_arr_vector_mult"
 if [ ! -x "$BIN" ]; then
     echo "Binary $BIN not found. Please run the top-level script (run_experiments_2.sh) to compile all binaries.";
+    exit 1
+fi
+if [ ! -x "$SEQ_BIN" ]; then
+    echo "Binary $SEQ_BIN not found. Please run the top-level script (run_experiments_2.sh) to compile all binaries.";
     exit 1
 fi
 
@@ -28,12 +33,13 @@ THREADS=(1 2 4 8)
 for n in "${NS[@]}"; do
     for s in "${SPARS[@]}"; do
         for reps in "${REPS[@]}"; do
-            # sequential baseline (label as 'sequential')
+            # sequential baseline (true sequential without OpenMP)
             echo -n "Running (sequential) n=$n sparsity=$s reps=$reps ... "
-            raw=$($BIN $n $s $reps 1)
+            raw=$($SEQ_BIN $n $s $reps)
             echo "$raw"
-            # reorder fields: raw is n,sparsity,reps,threads,nnz,... -> we want n,threads,sparsity,reps,nnz,... with threads='sequential'
-            line=$(echo "$raw" | awk -F',' '{printf "%s,%s,%s,%s", $1, "sequential", $2, $3; for(i=5;i<=NF;i++) printf ",%s", $i; printf "\n" }')
+            # seq output: n,sparsity,reps,nnz,time_init,time_csr_construct,time_spmv_total,time_dense_total,verification
+            # target: n,threads,sparsity,reps,nnz,time_init,time_csr_construct,time_spmv_total,time_dense_total,verification,user
+            line=$(echo "$raw" | awk -F',' '{printf "%s,%s,%s,%s", $1, "sequential", $2, $3; for(i=4;i<=NF;i++) printf ",%s", $i; printf "\n" }')
             echo "$line,$RUN_USER" >> "$CSV_FILE"
 
             # parallel runs
