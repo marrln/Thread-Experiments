@@ -2,6 +2,7 @@
 CFLAGS = -Wall -O2 -pthread
 CFLAGS_OPENMP = $(CFLAGS) -fopenmp
 CFLAGS_MPI    = $(CFLAGS)
+CFLAGS_SIMD   = $(CFLAGS) -mavx2
 LDFLAGS = -lm
 
 # 1_{i} experiment binaries
@@ -20,22 +21,28 @@ BIN_2_3 = 2_3_mergesort/bin
 BIN_3_1 = 3_1_polynomial_multiplication/bin
 BIN_3_2 = 3_2_sparse_array_vector_multiplication/bin
 
+# 4_{i} experiment binaries
+BIN_4_1 = 4_1_polynomial_multiplication/bin
+
 # Top-level all target
 all:	$(BIN_1_1) $(BIN_1_2) $(BIN_1_3) $(BIN_1_4) $(BIN_1_5) \
 		$(BIN_2_1)  $(BIN_2_2) $(BIN_2_3) \
 		$(BIN_3_1) $(BIN_3_2) \
+		$(BIN_4_1) \
 		$(BIN_1_1)/seq_poly_mult $(BIN_1_1)/poly_mult \
 		$(BIN_1_2)/shared_var \
 		$(BIN_1_3)/seq_arr_analysis $(BIN_1_3)/thread_arr_analysis_unpadded $(BIN_1_3)/thread_arr_analysis_padded $(BIN_1_3)/thread_arr_analysis_local_accum \
 		$(BIN_1_4)/seq_bank_sim $(BIN_1_4)/bank_sim \
 		$(BIN_1_5)/barrier_pthread $(BIN_1_5)/barrier_cond $(BIN_1_5)/barrier_sense $(BIN_2_2)/sparse_arr_vector_mult $(BIN_2_2)/seq_sparse_arr_vector_mult $(BIN_3_2)/sparse_arr_vector_mult $(BIN_3_2)/seq_sparse_arr_vector_mult \
 		$(BIN_2_1)/seq_poly_mult $(BIN_2_1)/poly_mult $(BIN_2_3)/mergesort \
-		$(BIN_3_1)/seq_poly_mult $(BIN_3_1)/thread_poly_mult 
+		$(BIN_3_1)/seq_poly_mult $(BIN_3_1)/thread_poly_mult \
+		$(BIN_4_1)/simd_poly_mult 
 
 # Create binary directories
 $(BIN_1_1) $(BIN_1_2) $(BIN_1_3) $(BIN_1_4) $(BIN_1_5) \
 $(BIN_2_1) $(BIN_2_2) $(BIN_2_3) \
-$(BIN_3_1) $(BIN_3_2):
+$(BIN_3_1) $(BIN_3_2) \
+$(BIN_4_1):
 	mkdir -p $@
 
 # 1.1 Polynomial multiplication
@@ -100,7 +107,11 @@ $(BIN_3_2)/sparse_arr_vector_mult: 3_2_sparse_array_vector_multiplication/sparse
 $(BIN_3_2)/seq_sparse_arr_vector_mult: 3_2_sparse_array_vector_multiplication/sequential_sparse_arr_vector_mult.c | $(BIN_3_2)
 	gcc $(CFLAGS) -o $@ $< $(LDFLAGS) 
 
+# 4.1 SIMD Polynomial multiplication
+$(BIN_4_1)/simd_poly_mult: 4_1_polynomial_multiplication/simd_poly_mult.c | $(BIN_4_1)
+	gcc $(CFLAGS_SIMD) -o $@ $< $(LDFLAGS)
+
 clean:
-	rm -rf $(BIN_1_1)/* $(BIN_1_2)/* $(BIN_1_3)/* $(BIN_1_4)/* $(BIN_1_5)/* $(BIN_2_1)/* $(BIN_2_2)/* $(BIN_2_3)/* $(BIN_3_1)/*  $(BIN_3_2)/*
+	rm -rf $(BIN_1_1)/* $(BIN_1_2)/* $(BIN_1_3)/* $(BIN_1_4)/* $(BIN_1_5)/* $(BIN_2_1)/* $(BIN_2_2)/* $(BIN_2_3)/* $(BIN_3_1)/*  $(BIN_3_2)/* $(BIN_4_1)/*
 
 .PHONY: all clean
