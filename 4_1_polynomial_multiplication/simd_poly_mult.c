@@ -41,12 +41,13 @@ void multiply_polynomials_simd(int *A, int *B, int *C, int n) {
             vec_sum = _mm256_add_epi32(vec_sum, vec_prod);
         }
         
-        int sum_array[8];
-        _mm256_storeu_si256((__m256i*)sum_array, vec_sum);
-        int sum = 0;
-        for (int j = 0; j < 8; j++) {
-            sum += sum_array[j];
-        }
+        __m128i sum_low = _mm256_castsi256_si128(vec_sum);
+        __m128i sum_high = _mm256_extracti128_si256(vec_sum, 1);
+        __m128i sum_128 = _mm_add_epi32(sum_low, sum_high);
+        
+        __m128i sum_64 = _mm_hadd_epi32(sum_128, sum_128);
+        __m128i sum_final = _mm_hadd_epi32(sum_64, sum_64);
+        int sum = _mm_cvtsi128_si32(sum_final);
         
         for (; i <= i_end; i++) {
             sum += A[i] * B[k - i];
