@@ -33,13 +33,10 @@ void multiply_polynomials_simd(int *A, int *B, int *C, int n) {
         int simd_end = i_start + (range / 8) * 8;
         for (; i < simd_end; i += 8) {
             __m256i vec_a = _mm256_loadu_si256((__m256i*)&A[i]);
-            
-            int b_indices[8];
-            for (int j = 0; j < 8; j++) {
-                b_indices[j] = B[k - (i + j)];
-            }
-            __m256i vec_b = _mm256_loadu_si256((__m256i*)b_indices);
-            
+            __m256i vec_b = _mm256_set_epi32(
+                B[k - (i + 7)], B[k - (i + 6)], B[k - (i + 5)], B[k - (i + 4)],
+                B[k - (i + 3)], B[k - (i + 2)], B[k - (i + 1)], B[k - i]
+            );
             __m256i vec_prod = _mm256_mullo_epi32(vec_a, vec_b);
             vec_sum = _mm256_add_epi32(vec_sum, vec_prod);
         }
