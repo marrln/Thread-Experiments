@@ -22,6 +22,8 @@ void multiply_polynomials_seq(int *A, int *B, int *C, int n) {
 void multiply_polynomials_simd(int *A, int *B, int *C, int n) {
     int size = 2 * n + 1;
     
+    __m256i reverse_mask = _mm256_set_epi32(0, 1, 2, 3, 4, 5, 6, 7);
+    
     for (int k = 0; k < size; k++) {
         int i_start = (k < n) ? 0 : k - n;
         int i_end   = (k < n) ? k : n;
@@ -33,10 +35,8 @@ void multiply_polynomials_simd(int *A, int *B, int *C, int n) {
         int simd_end = i_start + (range / 8) * 8;
         for (; i < simd_end; i += 8) {
             __m256i vec_a = _mm256_loadu_si256((__m256i*)&A[i]);
-            __m256i vec_b = _mm256_set_epi32(
-                B[k - (i + 7)], B[k - (i + 6)], B[k - (i + 5)], B[k - (i + 4)],
-                B[k - (i + 3)], B[k - (i + 2)], B[k - (i + 1)], B[k - i]
-            );
+            __m256i vec_b_rev = _mm256_loadu_si256((__m256i*)&B[k - i - 7]);
+            __m256i vec_b = _mm256_permutevar8x32_epi32(vec_b_rev, reverse_mask);
             __m256i vec_prod = _mm256_mullo_epi32(vec_a, vec_b);
             vec_sum = _mm256_add_epi32(vec_sum, vec_prod);
         }
